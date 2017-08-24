@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="kaba.yucata.envoy.GameCountActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:autoSizeMaxTextSize="30sp"
+        android:autoSizeMinTextSize="18sp"
+        android:clickable="false"
+        android:contentDescription="username"
+        android:gravity="bottom|center_horizontal"
+        android:lines="1"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:text="@string/username_init_txt"
+        android:textAlignment="center"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_yucata_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="2"
+        android:scaleType="fitCenter"
+        app:srcCompat="@mipmap/ic_launcher" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeMinTextSize="18sp"
+            android:clickable="false"
+            android:gravity="top|center_horizontal"
+            android:lines="1"
+            android:maxLines="1"
+            android:text="@string/waiting_games"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tv_num_games_waiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+        android:gravity="center"
+            android:ems="10"
+            android:inputType="number"
+            android:text="X"
+            android:textAlignment="center"
+        android:textSize="50sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeMinTextSize="18sp"
+            android:clickable="false"
+            android:gravity="top|center_horizontal"
+            android:lines="1"
+            android:maxLines="1"
+            android:text="@string/total_games"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tv_num_games_total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:ems="10"
+            android:text="X"
+            android:textAlignment="center"
+            android:inputType="number"
+        android:textSize="50sp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

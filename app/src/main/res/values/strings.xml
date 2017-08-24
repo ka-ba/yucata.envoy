@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Yucata Envoy</string>
+    <string name="mitem_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="waiting_games">Games waiting</string>
+    <string name="total_games">Games total</string>
+    <string name="username_init_txt">[please configure a username]</string>
+</resources>
