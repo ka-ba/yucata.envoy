@@ -8,12 +8,15 @@ import android.support.v7.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import kaba.yucata.envoy.datalink.LoaderHelper;
 
 public class GameCountActivity extends AppCompatActivity
-    implements SharedPreferences.OnSharedPreferenceChangeListener
+    implements SharedPreferences.OnSharedPreferenceChangeListener,
+        View.OnClickListener
 {
 
     public static final String PREF_KEY_USERNAME = "username";
@@ -21,6 +24,7 @@ public class GameCountActivity extends AppCompatActivity
     public static final String PREF_KEY_GAMES_TOTAL = "games_total";
     private LoaderHelper loaderHelper;
     private TextView tvUsername, tvGamesWaiting, tvGamesTotal;
+    private Button bReload;
     private SharedPreferences sharedPrefs;
 
     @Override
@@ -31,6 +35,8 @@ public class GameCountActivity extends AppCompatActivity
         tvUsername = (TextView) findViewById(R.id.tv_username);
         tvGamesWaiting = (TextView) findViewById(R.id.tv_num_games_waiting);
         tvGamesTotal = (TextView) findViewById(R.id.tv_num_games_total);
+        bReload = (Button) findViewById(R.id.b_reload);
+        bReload.setOnClickListener(this);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         // initialize display fields
         tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
@@ -54,7 +60,7 @@ public class GameCountActivity extends AppCompatActivity
     protected void onStart() {
         // app already runs, but moves from background to foreground - maybe update info
         super.onStart();
-        loaderHelper.loadInfoFromServer(getSupportLoaderManager(),"USERNAME");  // FIXME:
+        loaderHelper.loadInfoFromServer(getSupportLoaderManager(),sharedPrefs.getString(PREF_KEY_USERNAME, "X"));
     }
 
     @Override
@@ -95,4 +101,9 @@ public class GameCountActivity extends AppCompatActivity
         tv.setText((pref_value>-1?String.valueOf(pref_value):"X"));
     }
 
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.b_reload)
+            loaderHelper.loadInfoFromServer(getSupportLoaderManager(),sharedPrefs.getString(PREF_KEY_USERNAME, "X"));
+    }
 }
