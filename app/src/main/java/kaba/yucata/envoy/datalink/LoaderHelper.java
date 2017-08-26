@@ -1,5 +1,6 @@
 package kaba.yucata.envoy.datalink;
 
+import android.content.SharedPreferences;
 import android.support.v4.app.LoaderManager;
 //import android.app.LoaderManager;
 //import android.content.AsyncTaskLoader;
@@ -9,10 +10,14 @@ import android.icu.text.ScientificNumberFormatter;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import kaba.yucata.envoy.GameCountActivity;
 import kaba.yucata.envoy.StateInfo;
+
+import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_TOTAL;
+import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_WAITING;
 
 /**
  * Created by kaba on 08/08/17.
@@ -21,19 +26,29 @@ import kaba.yucata.envoy.StateInfo;
 public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
     protected final static int LOADER_ID=1502228361;
     private static final String USERNAME_KEY = "KEY-Username";
+    private static final long graceMillis = 60000;
     private final Context context;
+    private SharedPreferences sharedPrefs;
+    private long lastInvoked;
 
     public LoaderHelper(Context context) {
         this.context=context;
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public void loadInfoFromServer(LoaderManager loaderManager, String username) {
+        lastInvoked = System.currentTimeMillis();
         Bundle bundle=new Bundle();
         bundle.putString(USERNAME_KEY,username);
         final Loader<StateInfo> loader = loaderManager.getLoader(LOADER_ID);
         if(loader==null)
             loaderManager.initLoader(LOADER_ID,bundle,this);
         // FIXME: else restart??
+    }
+
+    public void loadInfoFromServerGrace(LoaderManager loaderManager, String username) {
+        if(System.currentTimeMillis()-lastInvoked > graceMillis )
+            loadInfoFromServer(loaderManager,username);
     }
 
     @Override
@@ -66,7 +81,10 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
     @Override
     public void onLoadFinished(Loader<StateInfo> loader, StateInfo stateInfo) {
         // use loaded info here
-
+        final SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putInt(PREF_KEY_GAMES_WAITING,stateInfo.getGamesWaiting());
+        editor.putInt(PREF_KEY_GAMES_TOTAL,stateInfo.getGamesTotal());
+        editor.apply();
     }
 
     @Override

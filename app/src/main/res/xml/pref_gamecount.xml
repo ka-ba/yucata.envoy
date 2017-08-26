@@ -2,12 +2,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
         android:key="username"
-        android:title="Yucata Username"/>
+        android:singleLine="true"
+        android:title="Yucata Username" />
     <EditTextPreference
+        android:contentDescription="secret provided by Yucata"
+        android:editable="true"
+        android:inputType="text|textNoSuggestions|textVisiblePassword"
         android:key="secret"
-        android:title="Yucata Envoy Secret"
-        android:inputType="textVisiblePassword"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:title="Yucata Envoy Secret" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="fire_notifications"
