@@ -13,6 +13,8 @@ import android.support.v4.content.Loader;
 import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import java.util.Random;
+
 import kaba.yucata.envoy.GameCountActivity;
 import kaba.yucata.envoy.StateInfo;
 
@@ -43,7 +45,9 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
         final Loader<StateInfo> loader = loaderManager.getLoader(LOADER_ID);
         if(loader==null)
             loaderManager.initLoader(LOADER_ID,bundle,this);
-        // FIXME: else restart??
+        else
+            loaderManager.restartLoader(LOADER_ID,bundle,this);
+        // FIXM E: else restart??
     }
 
     public void loadInfoFromServerGrace(LoaderManager loaderManager, String username) {
@@ -57,6 +61,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             @Override
             protected void onStartLoading() {
                 super.onStartLoading();
+                forceLoad();
             }
 
             @Override
@@ -72,7 +77,9 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
                 StateInfo info;
                 // fetch from network here
                 // FIXME: dummy code
-                info = new StateInfo(5,2);
+                final Random random = new Random(System.currentTimeMillis());
+                final int total = random.nextInt(25);
+                info = new StateInfo(total,random.nextInt(total+1));
                 return info;
             }
         };
