@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
 
 import sun.net.InetAddressCachePolicy;
 
@@ -16,7 +17,7 @@ public class Server {
      * @param args
      * @throws IOException
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
         InetAddress addr = InetAddress.getByAddress(new byte[]{127, 0, 0, 1});   // getByName("localhost");
         int port = 11121; //Integer.parseInt(System.getenv("PORT"));
         InetSocketAddress sock = new InetSocketAddress(addr, port);

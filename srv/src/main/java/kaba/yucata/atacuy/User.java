@@ -1,5 +1,7 @@
 package kaba.yucata.atacuy;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.security.SecureRandom;
 
@@ -9,15 +11,20 @@ import sun.misc.BASE64Encoder;
 
 class User {
     private final static SecureRandom secrand = new SecureRandom();
-    private final String name;
+    private final MessageDigest digest;
+    private final String name, secret;
+    private final byte[] secret_bytes;
     private int waiting, all;
     private byte[] token_bytes = new byte[8];
     private String token;
 
-    User(String n) {
+    User(String n, String s) throws NoSuchAlgorithmException {
         name = n;
+        secret = s;
+        secret_bytes = secret.getBytes();
         all = secrand.nextInt(10);
         waiting = secrand.nextInt(all + 1);
+        digest = MessageDigest.getInstance("SHA-256");
         prepareNextToken();
     }
 
@@ -37,7 +44,7 @@ class User {
             all += secrand.nextInt(11) - 5;
             if (all < 1)
                 all = 1;
-            waiting = secrand.nextInt(all / 3);
+            waiting = secrand.nextInt(1 + all / 3);
         } else {
             waiting += secrand.nextInt(all + 1 - waiting);
         }
@@ -47,5 +54,13 @@ class User {
     private void prepareNextToken() {
         secrand.nextBytes(token_bytes);
         token = DatatypeConverter.printBase64Binary(token_bytes);
+    }
+
+    public String getCurrentHash() {
+        final byte[] concat = new byte[ token_bytes.length + secret_bytes.length ];
+        System.arraycopy(token_bytes,0,concat,0,token_bytes.length);
+        System.arraycopy(secret_bytes,0,concat,token_bytes.length,secret_bytes.length);
+        final byte[] digested = digest.digest( concat );
+        return DatatypeConverter.printBase64Binary(digested);
     }
 }
