@@ -1,3 +1,7 @@
+# local constants not suitable for public repo
+app/src/main/java/kaba/yucata/envoy/LocalConsts.java
+srv/src/main/java/kaba/yucata/atacuy/LocalConsts.java
+
 # Built application files
 *.apk
 *.ap_

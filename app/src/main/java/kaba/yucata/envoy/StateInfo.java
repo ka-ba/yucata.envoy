@@ -7,10 +7,20 @@ package kaba.yucata.envoy;
 public class StateInfo {
     final private int gamesTotal;
     final private int gamesWaiting;
+    final private boolean error;
 
+    /** to be used in good time */
     public StateInfo(int total, int waiting) {
         gamesTotal=total;
         gamesWaiting=waiting;
+        error=false;
+    }
+
+    /** to be used in bad time */
+    public StateInfo() {
+        gamesTotal=-1;
+        gamesWaiting=-1;
+        error=true;
     }
 
     public int getGamesTotal() {
@@ -20,4 +30,6 @@ public class StateInfo {
     public int getGamesWaiting() {
         return gamesWaiting;
     }
+
+    public boolean wasErronous() { return error; }
 }

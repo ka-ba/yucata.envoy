@@ -50,12 +50,16 @@ class UserHandler implements HttpHandler {
             }
             // process request if action is known
             if("token".equals(uri_tokens[3])){
-                answer(exch,200, user.getNextToken(), "");
+                answer(exch,204, user.getNextToken(), null);
                 return;
             } else if("state".equals(uri_tokens[3])){
                 final String token = exch.getRequestHeaders().getFirst("Token");
-                System.out.println("got token '"+token+"', expected '"+user.getCurrentHash()+"'");
-                answer(exch,200, user.getNextToken(), user.getState());
+                final String hash_server = user.getCurrentHash();
+                System.out.println("got token '"+token+"', expected '"+hash_server+"'");
+                if(token.equals(hash_server))
+                    answer(exch,200, user.getNextToken(), user.getState());
+                else
+                    answer(exch,401, user.getNextToken(), "token mismatch");
                 return;
             } else {
                 answer(exch,418, null, "don't ask for coffee");
@@ -68,6 +72,7 @@ class UserHandler implements HttpHandler {
     }
 
     private void answer(HttpExchange exch, int http_code, String token, String content) throws IOException {
+        System.out.println("answering "+http_code+" '"+token+"', '"+content+"'");
         Headers headers = exch.getResponseHeaders();
         switch (http_code) {
             case 405:
@@ -76,13 +81,16 @@ class UserHandler implements HttpHandler {
         }
         if((token!=null)&&(token.length()>0))
             headers.set("Token", token);
-        final byte[] response = content.getBytes();
+        if(content!=null) {
+            final byte[] response = content.getBytes();
 //        exch.sendResponseHeaders(http_code, content.length());
-        exch.sendResponseHeaders(http_code, response.length);
-        OutputStream res = exch.getResponseBody();
+            exch.sendResponseHeaders(http_code, response.length);
+            OutputStream res = exch.getResponseBody();
 //		OutputStreamWriter write = new OutputStreamWriter(res);
 //		write.append(content);
-        res.write(response);
+            res.write(response);
+        } else
+            exch.sendResponseHeaders(http_code,-1);
         exch.close();
     }
 }

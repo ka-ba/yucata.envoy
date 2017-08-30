@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.security.NoSuchAlgorithmException;
+
 import kaba.yucata.envoy.datalink.LoaderHelper;
 
 public class GameCountActivity extends AppCompatActivity
@@ -20,8 +22,11 @@ public class GameCountActivity extends AppCompatActivity
 {
 
     public static final String PREF_KEY_USERNAME = "username";
+    public static final String PREF_KEY_SECRET = "secret";
     public static final String PREF_KEY_GAMES_WAITING = "games_waiting";
     public static final String PREF_KEY_GAMES_TOTAL = "games_total";
+    public static final String PREF_KEY_TOKEN = "token";
+    public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     private LoaderHelper loaderHelper;
     private TextView tvUsername, tvGamesWaiting, tvGamesTotal;
     private Button bReload;
@@ -44,7 +49,12 @@ public class GameCountActivity extends AppCompatActivity
         showPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPrefs);
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-        loaderHelper = new LoaderHelper(this);
+        try {
+            loaderHelper = new LoaderHelper(this);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            // FIXME: BIG BADABOOM
+        }
     }
 
     @Override
