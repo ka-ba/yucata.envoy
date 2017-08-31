@@ -3,11 +3,7 @@ package kaba.yucata.atacuy;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
-
-import kaba.yucata.envoy.LocalConsts;
-import sun.net.InetAddressCachePolicy;
 
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
@@ -26,7 +22,7 @@ public class Server {
         int port = 11121; //Integer.parseInt(System.getenv("PORT"));
         InetSocketAddress sock = new InetSocketAddress(addr, port);
         HttpServer httpserv = HttpServer.create(sock, 64);
-        HttpContext bla_cntxt = httpserv.createContext(UserHandler.CONTEXT, new UserHandler());
+        HttpContext user_cntxt = httpserv.createContext(UserHandler.CONTEXT, new UserHandler());
         httpserv.start();
     }
 }

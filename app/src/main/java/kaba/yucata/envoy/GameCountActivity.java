@@ -20,11 +20,11 @@ public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener
 {
-
     public static final String PREF_KEY_USERNAME = "username";
     public static final String PREF_KEY_SECRET = "secret";
     public static final String PREF_KEY_GAMES_WAITING = "games_waiting";
     public static final String PREF_KEY_GAMES_TOTAL = "games_total";
+    public static final String PREF_KEY_INVITES = "pers_invites";
     public static final String PREF_KEY_TOKEN = "token";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     private LoaderHelper loaderHelper;
@@ -45,8 +45,8 @@ public class GameCountActivity extends AppCompatActivity
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         // initialize display fields
         tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
-        showPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPrefs);
-        showPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPrefs);
+        showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPrefs);
+        showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPrefs);
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         try {
@@ -54,6 +54,7 @@ public class GameCountActivity extends AppCompatActivity
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             // FIXME: BIG BADABOOM
+            throw new RuntimeException("missing hash algo",e);
         }
     }
 
@@ -99,14 +100,15 @@ public class GameCountActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if( PREF_KEY_GAMES_WAITING.equals(key))
-            showPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPreferences);
+            showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPreferences);
         else if( PREF_KEY_GAMES_TOTAL.equals(key))
-            showPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPreferences);
+            showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPreferences);
+        // FIXME: invites...
         else if( PREF_KEY_USERNAME.equals(key))
-        tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
+            tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
     }
 
-    private void showPrefInTV(TextView tv, String pref_key, SharedPreferences sharedPrefs) {
+    private void showIntPrefInTV(TextView tv, String pref_key, SharedPreferences sharedPrefs) {
         final int pref_value = sharedPrefs.getInt(pref_key, -1);
         tv.setText((pref_value>-1?String.valueOf(pref_value):"X"));
     }
@@ -115,5 +117,6 @@ public class GameCountActivity extends AppCompatActivity
     public void onClick(View view) {
         if(view.getId()==R.id.b_reload)
             loaderHelper.loadInfoFromServer(getSupportLoaderManager(),sharedPrefs.getString(PREF_KEY_USERNAME, "X"));
+        // FIXME: super...?
     }
 }

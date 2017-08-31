@@ -15,7 +15,7 @@
         android:autoSizeMaxTextSize="30sp"
         android:autoSizeMinTextSize="18sp"
         android:clickable="false"
-        android:contentDescription="username"
+        android:contentDescription="@string/username_cont_desc"
         android:gravity="bottom|center_horizontal"
         android:lines="1"
         android:maxLines="1"
@@ -99,6 +99,31 @@
             android:textAlignment="center"
             android:inputType="number"
         android:textSize="50sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="30sp"
+            android:autoSizeMinTextSize="18sp"
+            android:clickable="false"
+            android:gravity="top|center_horizontal"
+            android:lines="1"
+            android:maxLines="1"
+            android:text="@string/pers_invites"
+            android:textAlignment="center"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tv_num_pers_invites"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:ems="10"
+            android:text="X"
+            android:textAlignment="center"
+            android:inputType="number"
+            android:textSize="50sp"/>
 
         <Button
             android:id="@+id/b_reload"

@@ -5,6 +5,8 @@
 
     <string name="waiting_games">Games waiting</string>
     <string name="total_games">Games total</string>
+    <string name="pers_invites">Personal invitations</string>
     <string name="username_init_txt">[please configure a username]</string>
     <string name="button_reload">Reload</string>
+    <string name="username_cont_desc">username</string>
 </resources>

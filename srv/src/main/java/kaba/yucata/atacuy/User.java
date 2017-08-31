@@ -2,19 +2,16 @@ package kaba.yucata.atacuy;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.security.SecureRandom;
 
 import javax.xml.bind.DatatypeConverter;
-
-import sun.misc.BASE64Encoder;
 
 class User {
     private final static SecureRandom secrand = new SecureRandom();
     private final MessageDigest digest;
     private final String name, secret;
     private final byte[] secret_bytes;
-    private int waiting, all;
+    private int waiting, all, invites; // games waiting to be played, all current games, current personal invitations
     private byte[] token_bytes = new byte[8];
     private String token;
 
@@ -24,6 +21,7 @@ class User {
         secret_bytes = secret.getBytes();
         all = secrand.nextInt(10);
         waiting = secrand.nextInt(all + 1);
+        invites = secrand.nextInt(waiting + 1);
         digest = MessageDigest.getInstance("SHA-256");
         prepareNextToken();
     }
@@ -38,7 +36,7 @@ class User {
     }
 
     String getState() {
-        final String state = "" + waiting + "\n" + all;
+        final String state = "" + waiting + "\n" + all + "\n" + invites;
         // construct next state
         if (waiting >= all) {
             all += secrand.nextInt(11) - 5;
@@ -48,6 +46,7 @@ class User {
         } else {
             waiting += secrand.nextInt(all + 1 - waiting);
         }
+        invites = secrand.nextInt(waiting+1);
         return state;
     }
 

@@ -2,19 +2,15 @@ package kaba.yucata.envoy.datalink;
 
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
-//import android.app.LoaderManager;
-//import android.content.AsyncTaskLoader;
 import android.content.Context;
-//import android.content.Loader;
-import android.icu.text.ScientificNumberFormatter;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,13 +23,12 @@ import java.net.URL;
 import java.net.UnknownServiceException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 
-import kaba.yucata.envoy.GameCountActivity;
 import kaba.yucata.envoy.StateInfo;
 
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_TOTAL;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_WAITING;
+import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_INVITES;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_LAST_RESPONSE;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_SECRET;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_TOKEN;
@@ -68,7 +63,6 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             loaderManager.initLoader(LOADER_ID,bundle,this);
         else
             loaderManager.restartLoader(LOADER_ID,bundle,this);
-        // FIXM E: else restart??
     }
 
     public void loadInfoFromServerGrace(LoaderManager loaderManager, String username) {
@@ -101,13 +95,9 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
                     return loadCurrentState(username);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
                     return null;
                 }
-                // FIX ME: dummy code
-//                final Random random = new Random(System.currentTimeMillis());
-//                final int total = random.nextInt(25);
-//                info = new StateInfo(total,random.nextInt(total+1));
-//                return info;
             }
         };
     }
@@ -130,7 +120,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
         }
     }
 
-    private StateInfo loadWithCommand(String username, String rest_cmd, boolean result)
+    private StateInfo loadWithCommand(String username, String rest_cmd, boolean result)  // FIXME: result currently unused
             throws IOException, SecurityException {
         HttpURLConnection urlConnection=null;
         int responseCode=666;
@@ -146,7 +136,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             else if ("token".equals(rest_cmd))
                 okCode = 204;
             else
-                throw new UnknownServiceException("unknown REST command " + rest_cmd);
+                throw new UnknownServiceException("internal: unknown REST command " + rest_cmd);
             final URL url = buildUrl(username, rest_cmd);
             urlConnection = (HttpURLConnection) url.openConnection();
             if ("state".equals(rest_cmd)) {
@@ -160,17 +150,19 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             if (responseCode == okCode) {
                 // everything seems in order
                 if ((new_token == null) || (new_token.length() < 1))
-                    throw new ProtocolException("no new token received");
+                    throw new ProtocolException("server: no new token received");
                 if(responseCode==200) {
                     InputStream in = urlConnection.getInputStream();
                     final BufferedReader reader = new BufferedReader(new InputStreamReader((in)));
                     final int waiting = Integer.parseInt(reader.readLine());
-                    System.out.println("answer waiting: '" + waiting + "'");
+                    System.out.println("answer waiting      : '" + waiting + "'");
                     final int all = Integer.parseInt(reader.readLine());
-                    System.out.println("answer all    : '" + all + "'");
-                    return new StateInfo(all,waiting);
+                    System.out.println("answer all          : '" + all + "'");
+                    final int invites = Integer.parseInt(reader.readLine());
+                    System.out.println("personal invitations: '" + invites + "'");
+                    return new StateInfo(all,waiting,invites);
                 }
-                return new StateInfo(0,0);  // fake numbers but no error
+                return new StateInfo(0,0,0);  // fake numbers but no error
             } else switch(responseCode) {
                 // a problem ... handle response codes we _can_ handle
                 case 401:
@@ -182,7 +174,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
                     throw new IllegalArgumentException("user unknown: "+username);
                     // break;
                 default:
-                    throw new IOException("unexpected response code "+responseCode);
+                    throw new IOException("internal: unexpected response code "+responseCode);
             }
         } catch(NumberFormatException e){
             e.printStackTrace();
@@ -210,12 +202,13 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
         final SharedPreferences.Editor editor = sharedPrefs.edit();
         editor.putInt(PREF_KEY_GAMES_WAITING,stateInfo.getGamesWaiting());
         editor.putInt(PREF_KEY_GAMES_TOTAL,stateInfo.getGamesTotal());
+        editor.putInt(PREF_KEY_INVITES,stateInfo.getPersonalInvites());
         editor.apply();
     }
 
     @Override
     public void onLoaderReset(Loader<StateInfo> loader) {
-
+        // FIXME: anything to do here?
     }
 
     private URL buildUrl(String username, String action) {
