@@ -16,6 +16,8 @@ import java.security.NoSuchAlgorithmException;
 
 import kaba.yucata.envoy.datalink.LoaderHelper;
 
+import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
+
 public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener
@@ -27,8 +29,10 @@ public class GameCountActivity extends AppCompatActivity
     public static final String PREF_KEY_INVITES = "pers_invites";
     public static final String PREF_KEY_TOKEN = "token";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
+    public enum STATES { STATE_OK,STATE_ERROR};
+    private STATES state;
     private LoaderHelper loaderHelper;
-    private TextView tvUsername, tvGamesWaiting, tvGamesTotal;
+    private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites;
     private Button bReload;
     private SharedPreferences sharedPrefs;
 
@@ -37,16 +41,16 @@ public class GameCountActivity extends AppCompatActivity
         // app gets created - set up basic stuff - read savedI..S.. if not null
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_count);
+        state=STATE_OK;
         tvUsername = (TextView) findViewById(R.id.tv_username);
         tvGamesWaiting = (TextView) findViewById(R.id.tv_num_games_waiting);
         tvGamesTotal = (TextView) findViewById(R.id.tv_num_games_total);
+        tvInvites = (TextView) findViewById(R.id.tv_num_pers_invites);
         bReload = (Button) findViewById(R.id.b_reload);
         bReload.setOnClickListener(this);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         // initialize display fields
-        tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
-        showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPrefs);
-        showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPrefs);
+        refreshDisplayedValues();
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         try {
@@ -103,13 +107,29 @@ public class GameCountActivity extends AppCompatActivity
             showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPreferences);
         else if( PREF_KEY_GAMES_TOTAL.equals(key))
             showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPreferences);
-        // FIXME: invites...
+        else if( PREF_KEY_INVITES.equals(key))
+            showIntPrefInTV(tvInvites,PREF_KEY_INVITES,sharedPreferences);
         else if( PREF_KEY_USERNAME.equals(key))
             tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
     }
 
+    private void refreshDisplayedValues() {
+        tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
+        showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPrefs);
+        showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPrefs);
+        showIntPrefInTV(tvInvites,PREF_KEY_INVITES,sharedPrefs);
+    }
+
     private void showIntPrefInTV(TextView tv, String pref_key, SharedPreferences sharedPrefs) {
-        final int pref_value = sharedPrefs.getInt(pref_key, -1);
+        int pref_value=9999;
+        switch(state) {
+            case STATE_OK:
+                pref_value = sharedPrefs.getInt(pref_key, -1);
+                break;
+            case STATE_ERROR:
+                pref_value = -1;  // yields X
+                break;
+        }
         tv.setText((pref_value>-1?String.valueOf(pref_value):"X"));
     }
 
@@ -118,5 +138,12 @@ public class GameCountActivity extends AppCompatActivity
         if(view.getId()==R.id.b_reload)
             loaderHelper.loadInfoFromServer(getSupportLoaderManager(),sharedPrefs.getString(PREF_KEY_USERNAME, "X"));
         // FIXME: super...?
+    }
+
+    public void setState(STATES s) {
+        STATES old=state;
+        state=s;
+        if(old!=state)
+            refreshDisplayedValues();
     }
 }

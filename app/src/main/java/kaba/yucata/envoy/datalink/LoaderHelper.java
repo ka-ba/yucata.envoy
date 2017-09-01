@@ -7,6 +7,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -24,6 +25,7 @@ import java.net.UnknownServiceException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import kaba.yucata.envoy.GameCountActivity;
 import kaba.yucata.envoy.StateInfo;
 
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_TOTAL;
@@ -32,6 +34,8 @@ import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_INVITES;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_LAST_RESPONSE;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_SECRET;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_TOKEN;
+import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
+import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 import static kaba.yucata.envoy.LocalConsts.BASEURL;
 
 /**
@@ -95,8 +99,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
                     return loadCurrentState(username);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG).show();
-                    return null;
+                    return new StateInfo(e.getMessage());
                 }
             }
         };
@@ -199,11 +202,20 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
         // use loaded info here
         if(stateInfo==null)
             return;
-        final SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putInt(PREF_KEY_GAMES_WAITING,stateInfo.getGamesWaiting());
-        editor.putInt(PREF_KEY_GAMES_TOTAL,stateInfo.getGamesTotal());
-        editor.putInt(PREF_KEY_INVITES,stateInfo.getPersonalInvites());
-        editor.apply();
+        if( ! stateInfo.wasErronous() ) {
+            final SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putInt(PREF_KEY_GAMES_WAITING, stateInfo.getGamesWaiting());
+            editor.putInt(PREF_KEY_GAMES_TOTAL, stateInfo.getGamesTotal());
+            editor.putInt(PREF_KEY_INVITES, stateInfo.getPersonalInvites());
+            editor.apply();
+            if( context instanceof GameCountActivity)
+                ((GameCountActivity)context).setState(STATE_OK);
+        } else {  // there was an error
+            if( context instanceof AppCompatActivity)
+                Toast.makeText(context, stateInfo.getErrorMessage(), Toast.LENGTH_LONG).show();
+            if( context instanceof GameCountActivity)
+                ((GameCountActivity)context).setState(STATE_ERROR);
+        }
     }
 
     @Override

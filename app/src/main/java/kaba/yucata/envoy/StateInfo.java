@@ -9,6 +9,7 @@ public class StateInfo {
     final private int gamesWaiting;
     final private int personalInvites;
     final private boolean error;
+    final private String errorMessage;
 
     /** to be used in good time */
     public StateInfo(int total, int waiting, int invites) {
@@ -16,14 +17,16 @@ public class StateInfo {
         gamesWaiting=waiting;
         personalInvites=invites;
         error=false;
+        errorMessage=null;
     }
 
     /** to be used in bad time */
-    public StateInfo() {
+    public StateInfo(String msg) {
         gamesTotal=-1;
         gamesWaiting=-1;
         personalInvites=-1;
         error=true;
+        errorMessage=msg;
     }
 
     public int getGamesTotal() {
@@ -39,4 +42,6 @@ public class StateInfo {
     }
 
     public boolean wasErronous() { return error; }
+
+    public String getErrorMessage() {return errorMessage; }
 }
