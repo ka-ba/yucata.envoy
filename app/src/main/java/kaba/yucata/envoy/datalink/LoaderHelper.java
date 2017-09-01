@@ -33,7 +33,7 @@ import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_WAITING;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_INVITES;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_LAST_RESPONSE;
 import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_SECRET;
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_TOKEN;
+import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_TOKEN_BASE64;
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 import static kaba.yucata.envoy.LocalConsts.BASEURL;
@@ -93,7 +93,6 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
                 final String username = bundle.getString(USERNAME_KEY);  // FIXME: get username from prefs instead?
                 if( username==null || TextUtils.isEmpty(username) )
                     return null;
-                StateInfo info;
                 // fetch from network here
                 try {
                     return loadCurrentState(username);
@@ -107,7 +106,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
 
     private StateInfo loadCurrentState(String username)
             throws IOException, SecurityException {
-        final String token = sharedPrefs.getString(PREF_KEY_TOKEN, null);
+        final String token = sharedPrefs.getString(PREF_KEY_TOKEN_BASE64, null);
         if((token!=null)&&(token.length()>0)) {
             // normal case: we known the current token from the previous operation
             try {
@@ -127,8 +126,6 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             throws IOException, SecurityException {
         HttpURLConnection urlConnection=null;
         int responseCode=666;
-        final byte[] token = Base64.decode(
-                sharedPrefs.getString(PREF_KEY_TOKEN, null),0);
         final String secret = sharedPrefs.getString(PREF_KEY_SECRET, null);
         if((secret==null)||(secret.length()<1))
             throw new IllegalStateException("no secret defined");
@@ -143,13 +140,15 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             final URL url = buildUrl(username, rest_cmd);
             urlConnection = (HttpURLConnection) url.openConnection();
             if ("state".equals(rest_cmd)) {
+                final String token_base64 = sharedPrefs.getString(PREF_KEY_TOKEN_BASE64, null);
+                final byte[] token = ( token_base64!=null ? Base64.decode(token_base64,0) : new byte[0] );
                 urlConnection.addRequestProperty("Token", getHash(token,secret.getBytes()));
             }
             responseCode = urlConnection.getResponseCode();
             final String new_token = urlConnection.getHeaderField("Token");
             System.out.println("answer token  : '" + new_token + "'");
             if ((new_token != null) && (new_token.length() > 0))
-                sharedPrefs.edit().putString(PREF_KEY_TOKEN,new_token).apply();
+                sharedPrefs.edit().putString(PREF_KEY_TOKEN_BASE64,new_token).apply();
             if (responseCode == okCode) {
                 // everything seems in order
                 if ((new_token == null) || (new_token.length() < 1))

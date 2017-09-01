@@ -27,7 +27,7 @@ public class GameCountActivity extends AppCompatActivity
     public static final String PREF_KEY_GAMES_WAITING = "games_waiting";
     public static final String PREF_KEY_GAMES_TOTAL = "games_total";
     public static final String PREF_KEY_INVITES = "pers_invites";
-    public static final String PREF_KEY_TOKEN = "token";
+    public static final String PREF_KEY_TOKEN_BASE64 = "token";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     public enum STATES { STATE_OK,STATE_ERROR};
     private STATES state;
