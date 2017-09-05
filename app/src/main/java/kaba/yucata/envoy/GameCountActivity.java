@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -59,6 +60,8 @@ public class GameCountActivity extends AppCompatActivity
             e.printStackTrace();
             // FIXME: BIG BADABOOM
             throw new RuntimeException("missing hash algo",e);
+        } catch (ConfigurationException e) {
+            // ignore here - lazy initialization
         }
     }
 
@@ -75,7 +78,7 @@ public class GameCountActivity extends AppCompatActivity
     protected void onStart() {
         // app already runs, but moves from background to foreground - maybe update info
         super.onStart();
-        loaderHelper.loadInfoFromServer(getSupportLoaderManager(),sharedPrefs.getString(PREF_KEY_USERNAME, "X"));
+        loadInfo();
     }
 
     @Override
@@ -103,14 +106,26 @@ public class GameCountActivity extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        boolean sesion_invalid=false;
         if( PREF_KEY_GAMES_WAITING.equals(key))
             showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPreferences);
         else if( PREF_KEY_GAMES_TOTAL.equals(key))
             showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPreferences);
         else if( PREF_KEY_INVITES.equals(key))
             showIntPrefInTV(tvInvites,PREF_KEY_INVITES,sharedPreferences);
-        else if( PREF_KEY_USERNAME.equals(key))
+        else if( PREF_KEY_USERNAME.equals(key)) {
+            sesion_invalid=true;
             tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
+        } else if( PREF_KEY_SECRET.equals(key))
+            sesion_invalid=true;
+        if (sesion_invalid) {
+            try {
+                if (loaderHelper != null)
+                    loaderHelper.renewSession();
+            } catch (ConfigurationException e) {
+                Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void refreshDisplayedValues() {
@@ -136,7 +151,7 @@ public class GameCountActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.b_reload)
-            loaderHelper.loadInfoFromServer(getSupportLoaderManager(),sharedPrefs.getString(PREF_KEY_USERNAME, "X"));
+            loadInfo();
         // FIXME: super...?
     }
 
@@ -145,5 +160,17 @@ public class GameCountActivity extends AppCompatActivity
         state=s;
         if(old!=state)
             refreshDisplayedValues();
+    }
+
+    private void loadInfo() {
+        try {
+            if(loaderHelper==null)
+                loaderHelper = new LoaderHelper(this);
+            loaderHelper.loadInfoFromServer(getSupportLoaderManager()/*,sharedPrefs.getString(PREF_KEY_USERNAME, "X")*/);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("should never happen here",e);
+        } catch (ConfigurationException e) {
+            Toast.makeText(this,"please configure username and password",Toast.LENGTH_LONG).show();
+        }
     }
 }
