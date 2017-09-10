@@ -3,6 +3,7 @@ package kaba.yucata.envoy.datalink;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Base64;
 
@@ -14,16 +15,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.net.UnknownServiceException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import kaba.yucata.envoy.ConfigurationException;
 
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_LAST_RESPONSE;
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_SECRET;
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_TOKEN_BASE64;
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_USERNAME;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_LAST_RESPONSE;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_SECRET;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TOKEN_BASE64;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_USERNAME;
 import static kaba.yucata.envoy.LocalConsts.BASEURL;
 
 /**
@@ -43,16 +43,18 @@ class DummyServerAbstraction extends ServerAbstraction {
         digest = MessageDigest.getInstance("SHA-256");
     }
 
+    @NonNull
     @Override
     public ServerAbstraction.SessionAbstraction recoverSession()
             throws ConfigurationException {
-//        try {
+        try {
             return new DummySession(false);
-//        } catch (IllegalStateException e) { // if no secret known from previous exchanges
-//            return null;
-//        }
+        } catch (IllegalStateException e) { // if no secret known from previous exchanges
+            throw new CommunicationException.NoSessionException("no session data to recover",e);
+        }
     }
 
+    @NonNull
     @Override
     public SessionAbstraction requestSession()
             throws ConfigurationException, SecurityException { // FIXME: really SecExc?
@@ -60,19 +62,19 @@ class DummyServerAbstraction extends ServerAbstraction {
         try {
             loadWithCommand(session,"token");
             return session;
-        } catch (IOException e) { // if no secret known from previous exchanges
-            return null;
+        } catch (Exception e) { // if no secret known from previous exchanges
+            throw new CommunicationException.NoSessionException("could not obtain session",e);
         }
     }
 
     @Override
-    public StateInfo loadInfo(SessionAbstraction session) throws
-            IOException, SecurityException, ConfigurationException {
+    public StateInfo loadInfo(@NonNull SessionAbstraction session) throws
+            CommunicationException, SecurityException, ConfigurationException {
         return loadWithCommand((DummySession) session, "state" );
     }
 
     private StateInfo loadWithCommand(DummySession session, String rest_cmd)
-            throws IOException, SecurityException, ConfigurationException, UnknownServiceException {
+            throws CommunicationException, SecurityException, ConfigurationException {
         HttpURLConnection urlConnection=null;
         int responseCode=666;
         final String secret = session.getSecret();
@@ -85,7 +87,7 @@ class DummyServerAbstraction extends ServerAbstraction {
             else if ("token".equals(rest_cmd))
                 okCode = 204;
             else
-                throw new UnknownServiceException("internal: unknown REST command " + rest_cmd);
+                throw new CommunicationException("internal: unknown REST command " + rest_cmd);
             final URL url = buildUrl(session.getUsername(), rest_cmd);
             urlConnection = (HttpURLConnection) url.openConnection();
             if ("state".equals(rest_cmd)) {
@@ -126,11 +128,13 @@ class DummyServerAbstraction extends ServerAbstraction {
                     throw new ConfigurationException("user unknown: "+session.getUsername());
                     // break;
                 default:
-                    throw new IOException("internal: unexpected response code "+responseCode);
+                    throw new CommunicationException("internal: unexpected response code "+responseCode);
             }
         } catch(NumberFormatException e){
-            e.printStackTrace();
-            throw new ProtocolException(e.getMessage());
+//            e.printStackTrace();
+            throw new CommunicationException("unparsable number",e);
+        } catch (IOException e) {
+            throw new CommunicationException("could not load info",e);
         } finally {
             if(urlConnection!=null)
                 urlConnection.disconnect();
@@ -162,6 +166,7 @@ class DummyServerAbstraction extends ServerAbstraction {
         private byte[] token;
         private final String username;
         private final String secret;
+
         DummySession(boolean need_token)
                 throws ConfigurationException, IllegalStateException {
             final String token_base64 = sharedPrefs.getString(PREF_KEY_TOKEN_BASE64, null);

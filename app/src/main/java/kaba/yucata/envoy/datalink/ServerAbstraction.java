@@ -1,5 +1,7 @@
 package kaba.yucata.envoy.datalink;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 
 import kaba.yucata.envoy.ConfigurationException;
@@ -9,9 +11,10 @@ import kaba.yucata.envoy.ConfigurationException;
  */
 
 public abstract class ServerAbstraction {
-    abstract public SessionAbstraction recoverSession() throws ConfigurationException;
-    abstract public SessionAbstraction requestSession() throws ConfigurationException, SecurityException;
-    abstract public StateInfo loadInfo(SessionAbstraction session) throws IOException, SecurityException, ConfigurationException;
+    abstract public @NonNull SessionAbstraction recoverSession() throws ConfigurationException, CommunicationException.NoSessionException;
+    abstract public @NonNull SessionAbstraction requestSession() throws ConfigurationException, SecurityException, CommunicationException;
+    abstract public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, SecurityException, ConfigurationException;
+
     public StateInfo coldCallLoadInfo(SessionAbstraction session) throws IOException, SecurityException, ConfigurationException {
         if(session==null)
             return coldCallLoadInfo();
@@ -24,14 +27,15 @@ public abstract class ServerAbstraction {
             return info;
         }
     }
-    public StateInfo coldCallLoadInfo() throws IOException, SecurityException, ConfigurationException {
+
+    public StateInfo coldCallLoadInfo() throws SecurityException, ConfigurationException {
         SessionAbstraction session;
         try {
             session = recoverSession();
             final StateInfo info = loadInfo(session);
             info.setSession(session);
             return info;
-        } catch(SecurityException e) {  // session invalid => try the full cycle exactly once
+        } catch(SecurityException|CommunicationException e) {  // session invalid => try the full cycle exactly once
             session = requestSession();
             final StateInfo info = loadInfo(session);
             info.setSession(session);

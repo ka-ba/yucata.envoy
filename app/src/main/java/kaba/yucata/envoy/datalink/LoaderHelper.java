@@ -10,15 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.widget.Toast;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.GameCountActivity;
 
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_TOTAL;
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_GAMES_WAITING;
-import static kaba.yucata.envoy.GameCountActivity.PREF_KEY_INVITES;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_TOTAL;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_WAITING;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INVITES;
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 
@@ -28,28 +25,25 @@ import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 
 public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
     protected final static int LOADER_ID=1502228361;
-//    private static final String USERNAME_KEY = "KEY-Username";
     private static final long graceMillis = 60000;
     private final Context context;
     private SharedPreferences sharedPrefs;
-    private final MessageDigest digest;
     private final ServerAbstraction server;
     private ServerAbstraction.SessionAbstraction session=null;
     private long lastInvoked;
 
     public LoaderHelper(Context context)
-            throws NoSuchAlgorithmException, ConfigurationException {
+            throws Error {
         this.context=context;
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-        digest = MessageDigest.getInstance("SHA-256");
-        server = new DummyServerAbstraction(context);
-        renewSession();
+//        server = new DummyServerAbstraction(context);
+        server = new YucataServerAbstraction(context);
+//        renewSession();
     }
 
-    public void loadInfoFromServer(LoaderManager loaderManager/*, String username*/) {
+    public void loadInfoFromServer(LoaderManager loaderManager) {
         lastInvoked = System.currentTimeMillis();
         Bundle bundle=new Bundle();
-//        bundle.putString(USERNAME_KEY,username);
         final Loader<StateInfo> loader = loaderManager.getLoader(LOADER_ID);
         if(loader==null)
             loaderManager.initLoader(LOADER_ID,bundle,this);
@@ -63,7 +57,11 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
     }
 
     public void renewSession() throws ConfigurationException {
-        session = server.recoverSession();
+        try {
+            session = server.recoverSession();
+        } catch( CommunicationException.NoSessionException e ) {
+            session = server.requestSession();
+        }
     }
 
     @Override
@@ -82,9 +80,6 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
 
             @Override
             public StateInfo loadInBackground() {
-//                final String username = bundle.getString(USERNAME_KEY);  // FIXME: get username from prefs instead?
-//                if( username==null || TextUtils.isEmpty(username) )
-//                    return null;
                 // fetch from network here
                 try {
                     final StateInfo info = server.coldCallLoadInfo(session);
@@ -113,6 +108,7 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             if( context instanceof GameCountActivity)
                 ((GameCountActivity)context).setState(STATE_OK);
         } else {  // there was an error
+            // FIXME: react on error type
             if( context instanceof AppCompatActivity)
                 Toast.makeText(context, stateInfo.getErrorMessage(), Toast.LENGTH_LONG).show();
             if( context instanceof GameCountActivity)

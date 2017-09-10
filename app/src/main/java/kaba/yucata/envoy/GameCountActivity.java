@@ -13,8 +13,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.security.NoSuchAlgorithmException;
-
+import kaba.yucata.envoy.datalink.CommunicationException;
 import kaba.yucata.envoy.datalink.LoaderHelper;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
@@ -23,13 +22,6 @@ public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener
 {
-    public static final String PREF_KEY_USERNAME = "username";
-    public static final String PREF_KEY_SECRET = "secret";
-    public static final String PREF_KEY_GAMES_WAITING = "games_waiting";
-    public static final String PREF_KEY_GAMES_TOTAL = "games_total";
-    public static final String PREF_KEY_INVITES = "pers_invites";
-    public static final String PREF_KEY_TOKEN_BASE64 = "token";
-    public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     public enum STATES { STATE_OK,STATE_ERROR};
     private STATES state;
     private LoaderHelper loaderHelper;
@@ -56,12 +48,10 @@ public class GameCountActivity extends AppCompatActivity
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         try {
             loaderHelper = new LoaderHelper(this);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (Error e) {
             e.printStackTrace();
-            // FIXME: BIG BADABOOM
-            throw new RuntimeException("missing hash algo",e);
-        } catch (ConfigurationException e) {
-            // ignore here - lazy initialization
+            // FIXME: BIG BADABOOM - find other way than rethrowing
+            throw e;
         }
     }
 
@@ -107,32 +97,32 @@ public class GameCountActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         boolean sesion_invalid=false;
-        if( PREF_KEY_GAMES_WAITING.equals(key))
-            showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPreferences);
-        else if( PREF_KEY_GAMES_TOTAL.equals(key))
-            showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPreferences);
-        else if( PREF_KEY_INVITES.equals(key))
-            showIntPrefInTV(tvInvites,PREF_KEY_INVITES,sharedPreferences);
-        else if( PREF_KEY_USERNAME.equals(key)) {
+        if( PrefsHelper.PREF_KEY_GAMES_WAITING.equals(key))
+            showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPreferences);
+        else if( PrefsHelper.PREF_KEY_GAMES_TOTAL.equals(key))
+            showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPreferences);
+        else if( PrefsHelper.PREF_KEY_INVITES.equals(key))
+            showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPreferences);
+        else if( PrefsHelper.PREF_KEY_USERNAME.equals(key)) {
             sesion_invalid=true;
-            tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
-        } else if( PREF_KEY_SECRET.equals(key))
+            tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
+        } else if( PrefsHelper.PREF_KEY_SECRET.equals(key))
             sesion_invalid=true;
-        if (sesion_invalid) {
-            try {
-                if (loaderHelper != null)
-                    loaderHelper.renewSession();
-            } catch (ConfigurationException e) {
-                Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
-            }
-        }
+//        if (sesion_invalid) {
+//            try {
+// FIXME: do sumthin sensible here...                if (loaderHelper != null)
+//                    loaderHelper.renewSession();
+//            } catch (ConfigurationException e) {
+//                Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
+//            }
+//        }
     }
 
     private void refreshDisplayedValues() {
-        tvUsername.setText(sharedPrefs.getString(PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
-        showIntPrefInTV(tvGamesWaiting,PREF_KEY_GAMES_WAITING,sharedPrefs);
-        showIntPrefInTV(tvGamesTotal,PREF_KEY_GAMES_TOTAL,sharedPrefs);
-        showIntPrefInTV(tvInvites,PREF_KEY_INVITES,sharedPrefs);
+        tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
+        showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPrefs);
+        showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPrefs);
+        showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPrefs);
     }
 
     private void showIntPrefInTV(TextView tv, String pref_key, SharedPreferences sharedPrefs) {
@@ -164,13 +154,18 @@ public class GameCountActivity extends AppCompatActivity
 
     private void loadInfo() {
         try {
-            if(loaderHelper==null)
-                loaderHelper = new LoaderHelper(this);
+//            if(loaderHelper==null)
+//                loaderHelper = new LoaderHelper(this);
             loaderHelper.loadInfoFromServer(getSupportLoaderManager()/*,sharedPrefs.getString(PREF_KEY_USERNAME, "X")*/);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("should never happen here",e);
-        } catch (ConfigurationException e) {
-            Toast.makeText(this,"please configure username and password",Toast.LENGTH_LONG).show();
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new RuntimeException("should never happen here",e);
+//        } catch (ConfigurationException e) {
+//            Toast.makeText(this,"please configure username and password",Toast.LENGTH_LONG).show();
+        } catch (CommunicationException.NoSessionException e) {
+            Toast.makeText(this,"error obtaining session\n"+e.toString(),Toast.LENGTH_LONG).show();
+            // FIXME: invalidate pref data ...
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException("should never happen here",e);
         }
     }
 }
