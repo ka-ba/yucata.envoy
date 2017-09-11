@@ -56,12 +56,17 @@ public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
             loadInfoFromServer(loaderManager/*,username*/);
     }
 
+    /** deprecated use invalidateSession instead */
     public void renewSession() throws ConfigurationException {
         try {
             session = server.recoverSession();
         } catch( CommunicationException.NoSessionException e ) {
             session = server.requestSession();
         }
+    }
+
+    public void invalidateSession() {
+        session=null;
     }
 
     @Override

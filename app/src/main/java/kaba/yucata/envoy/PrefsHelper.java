@@ -20,10 +20,36 @@ public class PrefsHelper {
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
 
     public static void clearSessionPrefs(SharedPreferences sharedPrefs) {
-        sharedPrefs.edit().
-                remove(PREF_KEY_SESSION_ID).
-                remove(PREF_KEY_YUCATA_TOKEN).
-                remove(PREF_KEY_TOKEN_BASE64).apply();
+        clearPrefs( sharedPrefs, PREF_KEY_SESSION_ID, PREF_KEY_YUCATA_TOKEN, PREF_KEY_TOKEN_BASE64 );
+    }
+
+    public static void clearInfoPrefs(SharedPreferences sharedPrefs) {
+        clearPrefs( sharedPrefs, PREF_KEY_GAMES_WAITING, PREF_KEY_GAMES_TOTAL, PREF_KEY_INVITES);
+    }
+
+    /** @return true, if session prefs cleared, false else
+     */
+    public static boolean clearPrefsBecausePrefChanged(SharedPreferences sharedPrefs, String key_updated) {
+        if( PREF_KEY_USERNAME.equals(key_updated) ) {
+            clearPrefs(sharedPrefs, PREF_KEY_USER_ID);
+            clearInfoPrefs(sharedPrefs);
+            clearSessionPrefs(sharedPrefs);
+            return true;
+        } else if( PREF_KEY_SECRET.equals(key_updated) ) {
+            clearInfoPrefs(sharedPrefs);
+            clearSessionPrefs(sharedPrefs);
+            return true;
+        } else if( PREF_KEY_SESSION_ID.equals(key_updated) ) {
+            clearInfoPrefs(sharedPrefs);
+        }
+        return false;
+    }
+
+    static void clearPrefs(SharedPreferences sharedPrefs, String... keys) {
+        final SharedPreferences.Editor editor = sharedPrefs.edit();
+        for( int i=0; i<keys.length; i++ )
+            editor.remove( keys[i] );
+        editor.apply();
     }
 
     public static void setStrings(SharedPreferences sharedPrefs, String... keys_values) {

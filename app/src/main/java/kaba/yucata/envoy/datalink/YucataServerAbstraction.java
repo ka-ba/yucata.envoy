@@ -113,7 +113,6 @@ public class YucataServerAbstraction extends ServerAbstraction {
             // receive
             connection.getResponseCode();
             final Collection<String> cookies = extractCookies(connection);
-   System.out.println("--I/O--requestSession--\n"+connection.toString()+"\n-----------------------");
             String session_id=null, token=null;
             for( String s : cookies ) {
                 if( s.startsWith("ASP.NET_SessionId=")) {
@@ -122,9 +121,16 @@ public class YucataServerAbstraction extends ServerAbstraction {
                     token=s;
                 }
             }
+            if(true&&DEBUG) {
+                System.out.println("---IN--requestSession--");
+                printHeaders(System.out, connection.getHeaderFields());
+            }
             if( (session_id==null) || (token==null) )
                 throw new SecurityException("login failed ("+connection.getResponseCode()+")");  // FIXME: subclass CommunicationExc.?
             PrefsHelper.setStrings( sharedPrefs, PREF_KEY_SESSION_ID, session_id, PREF_KEY_YUCATA_TOKEN, token );
+            if(true&&DEBUG) {
+                System.out.println("received session tokens:\n session: "+session_id+"\n yucata: "+token);
+            }
         } catch (IOException e) {
             throw new CommunicationException("cannot obtain session",e);  // FIXME: more specific exception?
         } finally {
@@ -171,6 +177,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
             connection.setRequestProperty("Accept","application/json");
             connection.setRequestProperty("Referer",GETGAMES_REFERER);
             connection.setRequestProperty("Cookie",y_session.getCookieHeaderValue());
+            // todo: set User-Agent (and test if overridden..)
             connection.setDoOutput(true);  // zero length post
             connection.setFixedLengthStreamingMode(0);
             // receive
@@ -203,6 +210,8 @@ public class YucataServerAbstraction extends ServerAbstraction {
             onTurnCount = parseJsonCountOnTurn(games,y_session.getUserId());
         }
         // FIXME: invitation count ?
+        if(true&&DEBUG)
+            System.out.println("received games info: "+totalGames+" total, "+onTurnCount+" on turn");
         return new StateInfo(totalGames,onTurnCount,-1);
     }
 
@@ -243,6 +252,9 @@ public class YucataServerAbstraction extends ServerAbstraction {
             if( (yucataToken==null) || (yucataToken.isEmpty()) )
                 throw new IllegalStateException("no current authentication token");
             userId = sharedPrefs.getInt(PREF_KEY_USER_ID,-1);
+            if(true&&DEBUG) {
+                System.out.println("new session object:\n session: "+sessionId+"\n yucata: "+yucataToken+"\n userid: "+userId);
+            }
         }
 
         public int getUserId() {

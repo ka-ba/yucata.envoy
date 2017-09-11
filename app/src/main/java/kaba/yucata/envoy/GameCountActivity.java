@@ -108,6 +108,10 @@ public class GameCountActivity extends AppCompatActivity
             tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
         } else if( PrefsHelper.PREF_KEY_SECRET.equals(key))
             sesion_invalid=true;
+        if( PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key) ) {  // FIXME: sensible now? infinite loop danger?
+            if(loaderHelper!=null)
+                loaderHelper.invalidateSession();
+        }
 //        if (sesion_invalid) {
 //            try {
 // FIXME: do sumthin sensible here...                if (loaderHelper != null)
