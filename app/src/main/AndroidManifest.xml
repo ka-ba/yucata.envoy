@@ -21,7 +21,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".datalink.LolliDataService" />
+        <service
+            android:name=".service.LolliJobService"
+            android:label="YucataDataService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <activity android:name=".SettingsActivity"
             android:label="@string/mitem_settings"

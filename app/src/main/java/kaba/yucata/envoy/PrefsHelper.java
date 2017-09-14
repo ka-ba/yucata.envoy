@@ -1,6 +1,8 @@
 package kaba.yucata.envoy;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.widget.Toast;
 
 /**
  * Created by kaba on 08/09/17.
@@ -10,6 +12,7 @@ public class PrefsHelper {
     public static final String PREF_KEY_USERNAME = "username";
     public static final String PREF_KEY_USER_ID = "userid";
     public static final String PREF_KEY_SECRET = "secret";
+    public static final String PREF_KEY_INTERVAL_MIN = "interval_minutes";
     public static final String PREF_KEY_GAMES_WAITING = "games_waiting";
     public static final String PREF_KEY_GAMES_TOTAL = "games_total";
     public static final String PREF_KEY_INVITES = "pers_invites";
@@ -59,5 +62,16 @@ public class PrefsHelper {
         for( int i=0; i<keys_values.length; i+=2 )
             editor.putString( keys_values[i], keys_values[i+1] );
         editor.apply();
+    }
+
+    public static int stringPrefToInt(SharedPreferences sharedPrefs, String key, int def, Context context) {
+        final String pref = sharedPrefs.getString(key, Integer.toString(def));
+        try {
+            return Integer.parseInt(pref);
+        } catch(NumberFormatException e) {
+            if(context!=null)
+                Toast.makeText(context,"cannot parse to int: "+pref+" ("+key+") using defualt: "+def,Toast.LENGTH_LONG).show();
+        }
+        return def;
     }
 }

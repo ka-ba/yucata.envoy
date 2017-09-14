@@ -1,12 +1,9 @@
-package kaba.yucata.envoy.datalink;
+package kaba.yucata.envoy.service;
 
 import android.app.job.JobInfo;
-import android.app.job.JobParameters;
 import android.app.job.JobScheduler;
-import android.app.job.JobService;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Loader;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
@@ -22,64 +19,63 @@ import static android.app.job.JobScheduler.RESULT_SUCCESS;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class LolliDataService extends DataService {
     private final JobScheduler scheduler;
-    private final LolliJobService jobService;
+//    private final LolliJobService jobService;
     private static final long flexMillis=60*1000;
 
     protected LolliDataService(Context context, int iterval) {
         super(context,iterval);
+        System.out.println("+LDS: constuctor");
         scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        jobService=new LolliJobService(this);
+//        jobService=new LolliJobService(this);
     }
 
     @Override
-    void resetTimer() {
-
+    public boolean resetTimer() {
+        System.out.println("will change scheduling interval to "+interval+" min");
+        scheduler.cancel(JOB_ID);
+        return shedule();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    boolean ensureRunning() {
+    public boolean ensureRunning() {
+        System.out.println("+LDS: ensure running");
         final List<JobInfo> allPendingJobs = scheduler.getAllPendingJobs();
         if(allPendingJobs!=null) {
             for( JobInfo pending : allPendingJobs ) {
-                if(pending.getId()==JOB_ID)
+                if(pending.getId()==JOB_ID) {
+                    if( pending.getIntervalMillis() != interval*60000 ) {
+                        System.out.println("will change scheduling interval from " + pending.getIntervalMillis() / 60000 + " min to " + interval+ " min");
+                        return resetTimer();
+                    }
+                    System.out.println("+LDS: job already runs with give interval of "+interval+" min");
                     return true;
+                }
             }
         }
 //        if( null != scheduler.getPendingJob(JOB_ID)) API M?
 //            return  true;
-        JobInfo job =  new JobInfo.Builder(
-                JOB_ID,new ComponentName(context,jobService.getClass()))
+        return shedule();
+    }
+
+    private boolean shedule() {
+        JobInfo job = new JobInfo.Builder(
+//                JOB_ID,new ComponentName(context,jobService.getClass()))
+                JOB_ID, new ComponentName(context, LolliJobService.class))
                 // FIXME: following into config
-        .setPeriodic(interval*1000)
+                .setPeriodic(interval * 60000)
                 .setPersisted(false)
                 .setRequiredNetworkType(NETWORK_TYPE_ANY)
 //                .setRequiresBatteryNotLow(true)  API O
                 .build();
+        System.out.println("+LDS: sheduling job");
         return scheduler.schedule(job) == RESULT_SUCCESS;
     }
 
     @Override
-    boolean ensureStopped() {
+    public boolean ensureStopped() {
         scheduler.cancel(JOB_ID);
         return true;
     }
 
-    private class LolliJobService extends JobService {
-
-        private final LolliDataService dataService;
-
-        private LolliJobService(LolliDataService ds) {
-            dataService=ds;
-        }
-        @Override
-        public boolean onStartJob(JobParameters jobParameters) {
-            return false;
-        }
-
-        @Override
-        public boolean onStopJob(JobParameters jobParameters) {
-            return false;
-        }
-    }
 }

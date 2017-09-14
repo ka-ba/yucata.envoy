@@ -1,32 +1,37 @@
-package kaba.yucata.envoy.datalink;
+package kaba.yucata.envoy.service;
 
 import android.content.Context;
-import android.opengl.EGLExt;
 import android.os.Build;
+
+import kaba.yucata.envoy.datalink.LoaderHelper;
+
+import static kaba.yucata.envoy.datalink.LoaderHelper.LOADER_ID;
 
 /** starts the loader every now and then
  * Created by kaba on 12/08/17.
  */
 
 public abstract class DataService {
-    protected static final int JOB_ID=LoaderHelper.LOADER_ID;  // recycle number
+    protected static final int JOB_ID= LOADER_ID;  // recycle number
     protected final Context context;
+    /** in minutes! */
     protected int interval;
 
     public void setParamenters( int interval ) {
         this.interval=interval;
-        // FIXME: reschedule?
+        resetTimer();
     }
 
     public DataService (Context context, int interval) {
         this.context=context;
-        setParamenters(interval);
+        this.interval=interval;
     }
-    abstract void resetTimer();
-    abstract boolean ensureRunning();
-    abstract boolean ensureStopped();
+    public abstract boolean resetTimer();
+    public abstract boolean ensureRunning();
+    public abstract boolean ensureStopped();
 
     public static DataService getService(Context context, int interval) {
+        System.out.println("+DS: getService");
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             return new LolliDataService(context,interval);
         else {

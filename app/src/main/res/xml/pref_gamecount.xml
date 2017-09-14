@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
         android:key="username"
         android:singleLine="true"
@@ -11,6 +12,12 @@
         android:key="secret"
         android:singleLine="true"
         android:title="Yucata Envoy Secret" />
+    <ListPreference
+        android:defaultValue="60"
+        android:entries="@array/polling_intervals"
+        android:entryValues="@array/polling_intervals_minutes"
+        android:key="interval_minutes"
+        android:title="Automatic update interval" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="fire_notifications"

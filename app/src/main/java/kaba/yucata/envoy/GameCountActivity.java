@@ -15,8 +15,11 @@ import android.widget.Toast;
 
 import kaba.yucata.envoy.datalink.CommunicationException;
 import kaba.yucata.envoy.datalink.LoaderHelper;
+import kaba.yucata.envoy.datalink.LoaderTask;
+import kaba.yucata.envoy.service.DataService;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INTERVAL_MIN;
 
 public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -24,7 +27,8 @@ public class GameCountActivity extends AppCompatActivity
 {
     public enum STATES { STATE_OK,STATE_ERROR};
     private STATES state;
-    private LoaderHelper loaderHelper;
+//    private LoaderHelper loaderHelper;
+    private DataService dataService=null;
     private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites;
     private Button bReload;
     private SharedPreferences sharedPrefs;
@@ -46,13 +50,16 @@ public class GameCountActivity extends AppCompatActivity
         refreshDisplayedValues();
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-        try {
-            loaderHelper = new LoaderHelper(this);
-        } catch (Error e) {
-            e.printStackTrace();
-            // FIXME: BIG BADABOOM - find other way than rethrowing
-            throw e;
-        }
+//        try {
+//            loaderHelper = new LoaderHelper(this);
+//        } catch (Error e) {
+//            e.printStackTrace();
+//            // FIXME: BIG BADABOOM - find other way than rethrowing
+//            throw e;
+//        }
+        final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
+        dataService = DataService.getService(this, interval);
+        dataService.ensureRunning();
     }
 
     @Override
@@ -68,7 +75,7 @@ public class GameCountActivity extends AppCompatActivity
     protected void onStart() {
         // app already runs, but moves from background to foreground - maybe update info
         super.onStart();
-        loadInfo();
+//        loadInfo();
     }
 
     @Override
@@ -108,9 +115,13 @@ public class GameCountActivity extends AppCompatActivity
             tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
         } else if( PrefsHelper.PREF_KEY_SECRET.equals(key))
             sesion_invalid=true;
+        else if( PrefsHelper.PREF_KEY_INTERVAL_MIN.equals(key)) {
+            final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
+            dataService.setParamenters(interval);
+        }
         if( PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key) ) {  // FIXME: sensible now? infinite loop danger?
-            if(loaderHelper!=null)
-                loaderHelper.invalidateSession();
+//                if(loaderHelper!=null)
+//                loaderHelper.invalidateSession();
         }
 //        if (sesion_invalid) {
 //            try {
@@ -144,8 +155,10 @@ public class GameCountActivity extends AppCompatActivity
 
     @Override
     public void onClick(View view) {
-        if(view.getId()==R.id.b_reload)
+        if(view.getId()==R.id.b_reload) {
+            dataService.resetTimer();
             loadInfo();
+        }
         // FIXME: super...?
     }
 
@@ -158,9 +171,10 @@ public class GameCountActivity extends AppCompatActivity
 
     private void loadInfo() {
         try {
+            new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
 //            if(loaderHelper==null)
 //                loaderHelper = new LoaderHelper(this);
-            loaderHelper.loadInfoFromServer(getSupportLoaderManager()/*,sharedPrefs.getString(PREF_KEY_USERNAME, "X")*/);
+//            loaderHelper.loadInfoFromServer(getSupportLoaderManager()/*,sharedPrefs.getString(PREF_KEY_USERNAME, "X")*/);
 //        } catch (NoSuchAlgorithmException e) {
 //            throw new RuntimeException("should never happen here",e);
 //        } catch (ConfigurationException e) {

@@ -24,7 +24,7 @@ import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
  */
 
 public class LoaderHelper implements LoaderManager.LoaderCallbacks<StateInfo> {
-    protected final static int LOADER_ID=1502228361;
+    public final static int LOADER_ID=1502228361;
     private static final long graceMillis = 60000;
     private final Context context;
     private SharedPreferences sharedPrefs;

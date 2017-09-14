@@ -61,7 +61,8 @@ public class YucataServerAbstraction extends ServerAbstraction {
     public final URL LOGIN_URL;
     public final URL GETGAMES_URL;
 
-    YucataServerAbstraction(Context c)
+    // FIXME: only public to test from service => return o default (no keyword)
+    public YucataServerAbstraction(Context c)
             throws Error {
         context=c;
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);

@@ -11,6 +11,7 @@ import kaba.yucata.envoy.ConfigurationException;
  */
 
 public abstract class ServerAbstraction {
+    private final static boolean DEBUG=true;
     abstract public @NonNull SessionAbstraction recoverSession() throws ConfigurationException, CommunicationException.NoSessionException;
     abstract public @NonNull SessionAbstraction requestSession() throws ConfigurationException, SecurityException, CommunicationException;
     abstract public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, SecurityException, ConfigurationException;
@@ -36,6 +37,8 @@ public abstract class ServerAbstraction {
             info.setSession(session);
             return info;
         } catch(SecurityException|CommunicationException e) {  // session invalid => try the full cycle exactly once
+            if(true&&DEBUG)
+                System.out.println("retrying fetch because of "+e.toString());
             session = requestSession();
             final StateInfo info = loadInfo(session);
             info.setSession(session);
