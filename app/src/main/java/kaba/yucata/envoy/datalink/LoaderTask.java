@@ -55,7 +55,6 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
                     .apply();
         }
     }
-    // ... onPostExecute...
     // ... invalidateSession...
 
     public static class LTActivity extends LoaderTask {

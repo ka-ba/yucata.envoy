@@ -19,14 +19,12 @@ import static android.app.job.JobScheduler.RESULT_SUCCESS;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class LolliDataService extends DataService {
     private final JobScheduler scheduler;
-//    private final LolliJobService jobService;
     private static final long flexMillis=60*1000;
 
     protected LolliDataService(Context context, int iterval) {
         super(context,iterval);
         System.out.println("+LDS: constuctor");
         scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-//        jobService=new LolliJobService(this);
     }
 
     @Override
@@ -53,16 +51,12 @@ public class LolliDataService extends DataService {
                 }
             }
         }
-//        if( null != scheduler.getPendingJob(JOB_ID)) API M?
-//            return  true;
         return shedule();
     }
 
     private boolean shedule() {
         JobInfo job = new JobInfo.Builder(
-//                JOB_ID,new ComponentName(context,jobService.getClass()))
                 JOB_ID, new ComponentName(context, LolliJobService.class))
-                // FIXME: following into config
                 .setPeriodic(interval * 60000)
                 .setPersisted(false)
                 .setRequiredNetworkType(NETWORK_TYPE_ANY)
@@ -77,5 +71,4 @@ public class LolliDataService extends DataService {
         scheduler.cancel(JOB_ID);
         return true;
     }
-
 }

@@ -1,7 +1,5 @@
 package kaba.yucata.envoy.datalink;
 
-import kaba.yucata.envoy.datalink.ServerAbstraction;
-
 /**
  * Created by kaba on 08/08/17.
  */

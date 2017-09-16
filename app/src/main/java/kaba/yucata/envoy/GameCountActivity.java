@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import kaba.yucata.envoy.datalink.CommunicationException;
-import kaba.yucata.envoy.datalink.LoaderHelper;
 import kaba.yucata.envoy.datalink.LoaderTask;
 import kaba.yucata.envoy.service.DataService;
 
@@ -27,7 +26,6 @@ public class GameCountActivity extends AppCompatActivity
 {
     public enum STATES { STATE_OK,STATE_ERROR};
     private STATES state;
-//    private LoaderHelper loaderHelper;
     private DataService dataService=null;
     private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites;
     private Button bReload;
@@ -50,13 +48,6 @@ public class GameCountActivity extends AppCompatActivity
         refreshDisplayedValues();
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-//        try {
-//            loaderHelper = new LoaderHelper(this);
-//        } catch (Error e) {
-//            e.printStackTrace();
-//            // FIXME: BIG BADABOOM - find other way than rethrowing
-//            throw e;
-//        }
         final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
         dataService = DataService.getService(this, interval);
         dataService.ensureRunning();
@@ -75,7 +66,6 @@ public class GameCountActivity extends AppCompatActivity
     protected void onStart() {
         // app already runs, but moves from background to foreground - maybe update info
         super.onStart();
-//        loadInfo();
     }
 
     @Override
@@ -120,17 +110,8 @@ public class GameCountActivity extends AppCompatActivity
             dataService.setParamenters(interval);
         }
         if( PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key) ) {  // FIXME: sensible now? infinite loop danger?
-//                if(loaderHelper!=null)
-//                loaderHelper.invalidateSession();
         }
-//        if (sesion_invalid) {
-//            try {
 // FIXME: do sumthin sensible here...                if (loaderHelper != null)
-//                    loaderHelper.renewSession();
-//            } catch (ConfigurationException e) {
-//                Toast.makeText(this,e.getMessage(),Toast.LENGTH_LONG).show();
-//            }
-//        }
     }
 
     private void refreshDisplayedValues() {
@@ -172,18 +153,9 @@ public class GameCountActivity extends AppCompatActivity
     private void loadInfo() {
         try {
             new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
-//            if(loaderHelper==null)
-//                loaderHelper = new LoaderHelper(this);
-//            loaderHelper.loadInfoFromServer(getSupportLoaderManager()/*,sharedPrefs.getString(PREF_KEY_USERNAME, "X")*/);
-//        } catch (NoSuchAlgorithmException e) {
-//            throw new RuntimeException("should never happen here",e);
-//        } catch (ConfigurationException e) {
-//            Toast.makeText(this,"please configure username and password",Toast.LENGTH_LONG).show();
         } catch (CommunicationException.NoSessionException e) {
             Toast.makeText(this,"error obtaining session\n"+e.toString(),Toast.LENGTH_LONG).show();
             // FIXME: invalidate pref data ...
-//        } catch (MalformedURLException e) {
-//            throw new RuntimeException("should never happen here",e);
         }
     }
 }

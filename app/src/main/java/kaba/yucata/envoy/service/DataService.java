@@ -3,14 +3,12 @@ package kaba.yucata.envoy.service;
 import android.content.Context;
 import android.os.Build;
 
-import static kaba.yucata.envoy.datalink.LoaderHelper.LOADER_ID;
-
 /** starts the loader every now and then
  * Created by kaba on 12/08/17.
  */
 
 public abstract class DataService {
-    protected static final int JOB_ID= LOADER_ID;  // recycle number
+    protected static final int JOB_ID=1502228361;
     protected final Context context;
     /** in minutes! */
     protected int interval;
