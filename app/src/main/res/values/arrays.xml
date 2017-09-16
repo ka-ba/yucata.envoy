@@ -2,6 +2,7 @@
 <resources>
     <string-array name="polling_intervals">
         <item>never</item>
+        <item>2 min</item>  <!--FIXME: for debugging only!-->
         <item>15 min</item>
         <item>30 min</item>
         <item>45 min</item>
@@ -13,6 +14,7 @@
     </string-array>
     <string-array name="polling_intervals_minutes">
         <item>999999</item>  <!--FIXME: correctly implement "never" as stop of service-->
+        <item>2</item>
         <item>15</item>
         <item>30</item>
         <item>45</item>

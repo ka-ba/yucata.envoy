@@ -12,14 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="2"
-        android:autoSizeMaxTextSize="30sp"
-        android:autoSizeMinTextSize="18sp"
         android:clickable="false"
         android:contentDescription="@string/username_cont_desc"
         android:gravity="bottom|center_horizontal"
         android:lines="1"
         android:maxLines="1"
-        android:singleLine="true"
         android:text="@string/username_init_txt"
         android:textAlignment="center"
         android:textSize="24sp"
@@ -37,6 +34,7 @@
         android:scaleType="fitCenter"
         app:srcCompat="@mipmap/ic_launcher" />
 
+    <!-- waiting -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -46,8 +44,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autoSizeMaxTextSize="30sp"
-            android:autoSizeMinTextSize="18sp"
             android:clickable="false"
             android:gravity="top|center_horizontal"
             android:lines="1"
@@ -60,15 +56,14 @@
             android:id="@+id/tv_num_games_waiting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
         android:gravity="center"
             android:ems="10"
-            android:inputType="number"
             android:text="X"
             android:textAlignment="center"
         android:textSize="50sp"/>
     </LinearLayout>
 
+    <!-- total -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -78,8 +73,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autoSizeMaxTextSize="30sp"
-            android:autoSizeMinTextSize="18sp"
             android:clickable="false"
             android:gravity="top|center_horizontal"
             android:lines="1"
@@ -92,19 +85,26 @@
             android:id="@+id/tv_num_games_total"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center"
             android:ems="10"
             android:text="X"
             android:textAlignment="center"
-            android:inputType="number"
         android:textSize="50sp"/>
 
+    </LinearLayout>
+
+    <!-- invites -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:visibility="gone">
+
         <TextView
+            android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autoSizeMaxTextSize="30sp"
-            android:autoSizeMinTextSize="18sp"
             android:clickable="false"
             android:gravity="top|center_horizontal"
             android:lines="1"
@@ -117,22 +117,20 @@
             android:id="@+id/tv_num_pers_invites"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
             android:ems="10"
+            android:gravity="center"
             android:text="X"
             android:textAlignment="center"
-            android:inputType="number"
-            android:textSize="50sp"/>
-
-        <Button
-            android:id="@+id/b_reload"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="@string/button_reload"
-            android:textAlignment="center" />
+            android:textSize="50sp" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/b_reload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:text="@string/button_reload"
+        android:textAlignment="center" />
 
 </LinearLayout>

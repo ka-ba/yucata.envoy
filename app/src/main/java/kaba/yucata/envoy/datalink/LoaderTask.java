@@ -1,12 +1,16 @@
 package kaba.yucata.envoy.datalink;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v7.app.NotificationCompat;
 import android.widget.Toast;
 
 import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.GameCountActivity;
+import kaba.yucata.envoy.R;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
@@ -19,6 +23,7 @@ import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INVITES;
  */
 
 public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
+    public final static int NOTIFICATION_ID=1502228361;
     public final Context context;
     public final SharedPreferences sharedPrefs;
 
@@ -76,6 +81,25 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
         @Override
         protected void onPostExecute(StateInfo info) {
             super.onPostExecute(info);
+            if( ! info.wasErronous() )  // FIXME: show different notification on error
+                popupNotification( sharedPrefs.getInt(PREF_KEY_GAMES_WAITING,0),sharedPrefs.getInt(PREF_KEY_GAMES_TOTAL,0) );
+        }
+        private void popupNotification(int waiting, int total) {
+            final NotificationManager notiService = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if(waiting<1) {
+                notiService.cancel(NOTIFICATION_ID);
+                System.out.println("notification canceled");
+                return;
+            }
+            final Notification noti = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_stat_notify)
+                    .setContentTitle( ""+waiting+(waiting==1?" game":" games")+" waiting for your move" )
+                    .setContentText("out of "+total+" games in total")
+                    .setCategory(Notification.CATEGORY_SOCIAL)
+                    .setAutoCancel(true)
+                    .build();
+            notiService.notify( NOTIFICATION_ID, noti );
+            System.out.println("notification posted for "+waiting+","+total);
         }
     }
 }

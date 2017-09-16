@@ -3,8 +3,6 @@ package kaba.yucata.envoy.service;
 import android.content.Context;
 import android.os.Build;
 
-import kaba.yucata.envoy.datalink.LoaderHelper;
-
 import static kaba.yucata.envoy.datalink.LoaderHelper.LOADER_ID;
 
 /** starts the loader every now and then
