@@ -16,4 +16,7 @@
     <string name="k_pref_interval_min">interval_minutes</string>
     <string name="k_pref_notifications">fire_notifications</string>
 
+    <string name="polling_intervals_minutes_never">999999</string>
+    <string name="polling_intervals_minutes_15">15</string>
+
 </resources>
