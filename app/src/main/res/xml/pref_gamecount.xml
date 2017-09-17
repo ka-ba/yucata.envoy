@@ -2,25 +2,25 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
-        android:key="username"
+        android:key="@string/k_pref_username"
         android:singleLine="true"
         android:title="Yucata Username" />
     <EditTextPreference
         android:contentDescription="secret provided by Yucata"
         android:editable="true"
         android:inputType="text|textNoSuggestions|textVisiblePassword"
-        android:key="secret"
+        android:key="@string/k_pref_password"
         android:singleLine="true"
         android:title="Yucata Envoy Secret" />
     <ListPreference
         android:defaultValue="60"
         android:entries="@array/polling_intervals"
         android:entryValues="@array/polling_intervals_minutes"
-        android:key="interval_minutes"
+        android:key="@string/k_pref_interval_min"
         android:title="Automatic update interval" />
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="fire_notifications"
+        android:key="@string/k_pref_notifications"
         android:summaryOn="notify user"
         android:summaryOff="no notifications"
         android:title="Fire up Notifications"/>

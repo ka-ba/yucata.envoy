@@ -9,4 +9,11 @@
     <string name="username_init_txt">[please configure a username]</string>
     <string name="button_reload">Reload</string>
     <string name="username_cont_desc">username</string>
+
+    <!-- technical items: keys -->
+    <string name="k_pref_username">username</string>
+    <string name="k_pref_password">secret</string>
+    <string name="k_pref_interval_min">interval_minutes</string>
+    <string name="k_pref_notifications">fire_notifications</string>
+
 </resources>
