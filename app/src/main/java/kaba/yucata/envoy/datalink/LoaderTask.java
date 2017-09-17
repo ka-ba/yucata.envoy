@@ -2,7 +2,9 @@ package kaba.yucata.envoy.datalink;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.NotificationCompat;
@@ -23,7 +25,6 @@ import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INVITES;
  */
 
 public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
-    public final static int NOTIFICATION_ID=1502228361;
     public final Context context;
     public final SharedPreferences sharedPrefs;
 
@@ -74,10 +75,15 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
     }
 
     public static class LTService extends LoaderTask {
+        public final static int NOTIFICATION_ID=1502228361;
+        private static final int PENDING_INTENT_ID = NOTIFICATION_ID;
         private final NotificationManager notificationMgr;
-        public LTService(Context context,SharedPreferences sharedPrefs) {
+        private final PendingIntent pendingIntent;
+        public LTService(Context context, SharedPreferences sharedPrefs) {
             super(context,sharedPrefs);
             notificationMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            final Intent intent = new Intent(context, GameCountActivity.class);
+            pendingIntent = PendingIntent.getActivity(context, PENDING_INTENT_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
         @Override
         protected void onPostExecute(StateInfo info) {
@@ -98,7 +104,8 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
             builder.setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle( ""+waiting+(waiting==1?" game":" games")+" waiting for your move" )
                     .setContentText("out of "+total+" games in total")
-                    .setAutoCancel(true);
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent);
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 builder.setCategory(Notification.CATEGORY_SOCIAL);
             }

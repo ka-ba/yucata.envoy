@@ -69,6 +69,7 @@ public class LolliDataService extends DataService {
     @Override
     public boolean ensureStopped() {
         scheduler.cancel(JOB_ID);
+        System.out.println("+LDS: canceled job");
         return true;
     }
 }

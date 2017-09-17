@@ -48,9 +48,17 @@ public class GameCountActivity extends AppCompatActivity
         refreshDisplayedValues();
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+        dataService = DataService.getService(this, 999999);  // FIXME: eliminate interval from constructor?
+        setDataServiceInterval();
+    }
+
+    private void setDataServiceInterval() {
         final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
-        dataService = DataService.getService(this, interval);
-        dataService.ensureRunning();
+        if( interval != 999999 ) {  // 999999 means: no service
+            dataService.setParamenters(interval);
+            dataService.ensureRunning();
+        } else
+            dataService.ensureStopped();
     }
 
     @Override
@@ -106,8 +114,7 @@ public class GameCountActivity extends AppCompatActivity
         } else if( PrefsHelper.PREF_KEY_SECRET.equals(key))
             sesion_invalid=true;
         else if( PrefsHelper.PREF_KEY_INTERVAL_MIN.equals(key)) {
-            final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
-            dataService.setParamenters(interval);
+            setDataServiceInterval();
         }
         if( PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key) ) {  // FIXME: sensible now? infinite loop danger?
         }
@@ -137,7 +144,9 @@ public class GameCountActivity extends AppCompatActivity
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.b_reload) {
-            dataService.resetTimer();
+            final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
+            if( interval != 999999 )  // 999999 means: no service
+                dataService.resetTimer();
             loadInfo();
         }
         // FIXME: super...?
