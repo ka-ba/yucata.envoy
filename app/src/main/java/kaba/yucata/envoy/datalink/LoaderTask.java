@@ -74,30 +74,36 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
     }
 
     public static class LTService extends LoaderTask {
+        private final NotificationManager notificationMgr;
         public LTService(Context context,SharedPreferences sharedPrefs) {
             super(context,sharedPrefs);
+            notificationMgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         }
         @Override
         protected void onPostExecute(StateInfo info) {
-            super.onPostExecute(info);
-            if( ! info.wasErronous() )  // FIXME: show different notification on error
-                popupNotification( sharedPrefs.getInt(PREF_KEY_GAMES_WAITING,0),sharedPrefs.getInt(PREF_KEY_GAMES_TOTAL,0) );
+            super.onPostExecute(info);  // stores values to prefs
+            if( sharedPrefs.getBoolean(context.getText( R.string.k_pref_notifications ).toString(),true)) {
+                if (!info.wasErronous())  // FIXME: show different notification on error
+                    popupNotification(sharedPrefs.getInt(PREF_KEY_GAMES_WAITING, 0), sharedPrefs.getInt(PREF_KEY_GAMES_TOTAL, 0));
+            } else
+                notificationMgr.cancel(NOTIFICATION_ID);
         }
         private void popupNotification(int waiting, int total) {
-            final NotificationManager notiService = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             if(waiting<1) {
-                notiService.cancel(NOTIFICATION_ID);
+                notificationMgr.cancel(NOTIFICATION_ID);
                 System.out.println("notification canceled");
                 return;
             }
-            final Notification noti = new NotificationCompat.Builder(context)
-                    .setSmallIcon(R.drawable.ic_stat_notify)
+            final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+            builder.setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentTitle( ""+waiting+(waiting==1?" game":" games")+" waiting for your move" )
                     .setContentText("out of "+total+" games in total")
-                    .setCategory(Notification.CATEGORY_SOCIAL)
-                    .setAutoCancel(true)
-                    .build();
-            notiService.notify( NOTIFICATION_ID, noti );
+                    .setAutoCancel(true);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                builder.setCategory(Notification.CATEGORY_SOCIAL);
+            }
+            final Notification noti = builder.build();
+            notificationMgr.notify( NOTIFICATION_ID, noti );
             System.out.println("notification posted for "+waiting+","+total);
         }
     }
