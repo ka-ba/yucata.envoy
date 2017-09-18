@@ -19,6 +19,7 @@ import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_TOTAL;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_WAITING;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INVITES;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TIME_LAST_LOAD;
 
 /**
  * Created by kaba on 13/09/17.
@@ -53,6 +54,7 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
                     .putInt(PREF_KEY_GAMES_WAITING, info.getGamesWaiting())
                     .putInt(PREF_KEY_GAMES_TOTAL, info.getGamesTotal())
                     .putInt(PREF_KEY_INVITES, info.getPersonalInvites())
+                    .putLong(PREF_KEY_TIME_LAST_LOAD,System.currentTimeMillis())
                     .apply();
         }
     }

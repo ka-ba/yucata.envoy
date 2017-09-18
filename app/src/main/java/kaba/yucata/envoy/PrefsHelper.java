@@ -21,6 +21,7 @@ public class PrefsHelper {
     public static final String PREF_KEY_YUCATA_TOKEN = "token";
     public static final String PREF_KEY_SESSION_ID = "session";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
+    public static final String PREF_KEY_TIME_LAST_LOAD = "last_load_time_stamp";
 
     public static void clearSessionPrefs(SharedPreferences sharedPrefs) {
         clearPrefs( sharedPrefs, PREF_KEY_SESSION_ID, PREF_KEY_YUCATA_TOKEN, PREF_KEY_TOKEN_BASE64 );

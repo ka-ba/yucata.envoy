@@ -3,6 +3,7 @@ package kaba.yucata.envoy;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.view.Menu;
@@ -19,11 +20,15 @@ import kaba.yucata.envoy.service.DataService;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INTERVAL_MIN;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TIME_LAST_LOAD;
 
 public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener
 {
+    private static final long RELOAD_WAIT_MILLIS = 120000;  // TODO: 300000 = 5 min better / necessary?
+    private CountDownTimer reloadCountdown=null;
+
     public enum STATES { STATE_OK,STATE_ERROR};
     private STATES state;
     private DataService dataService=null;
@@ -74,6 +79,13 @@ public class GameCountActivity extends AppCompatActivity
     protected void onStart() {
         // app already runs, but moves from background to foreground - maybe update info
         super.onStart();
+        hideButtonByCountdown();  // also tests if necessary
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopButtonCountdown();
     }
 
     @Override
@@ -115,7 +127,8 @@ public class GameCountActivity extends AppCompatActivity
             sesion_invalid=true;
         else if( PrefsHelper.PREF_KEY_INTERVAL_MIN.equals(key)) {
             setDataServiceInterval();
-        }
+        } else if( PrefsHelper.PREF_KEY_TIME_LAST_LOAD.equals(key))
+            hideButtonByCountdown();
         if( PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key) ) {  // FIXME: sensible now? infinite loop danger?
         }
 // FIXME: do sumthin sensible here...                if (loaderHelper != null)
@@ -166,5 +179,40 @@ public class GameCountActivity extends AppCompatActivity
             Toast.makeText(this,"error obtaining session\n"+e.toString(),Toast.LENGTH_LONG).show();
             // FIXME: invalidate pref data ...
         }
+    }
+
+    private void hideButtonByCountdown() {
+        final long tload = sharedPrefs.getLong(PREF_KEY_TIME_LAST_LOAD, 1L);
+        final long tdiff = tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
+        if( tdiff >= 2000 ) {
+            bReload.setEnabled(false);
+            reloadCountdown = new CountDownTimer(tdiff,1000) {
+                @Override
+                public void onTick(long tleft) {
+                    final long mleft = tleft / 60000;
+                    final long sleft = (tleft-mleft) / 1000;
+                    bReload.setText( String.format("%d:%02d",mleft,sleft));
+                }
+                @Override
+                public void onFinish() {
+                    stopButtonCountdown(false);
+                }
+            }.start();
+        } else
+            stopButtonCountdown(true);
+    }
+
+    private void stopButtonCountdown() {
+        stopButtonCountdown(true);
+    }
+    private void stopButtonCountdown( boolean stop_timer ) {
+        if(stop_timer) {
+            if(reloadCountdown!=null) {
+                reloadCountdown.cancel();
+                reloadCountdown = null;
+            }
+        }
+        bReload.setText( R.string.button_reload );
+        bReload.setEnabled(true);
     }
 }
