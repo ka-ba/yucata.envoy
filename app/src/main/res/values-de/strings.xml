@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Yucata Bote</string>
+    <string name="e_loadinginfo">Fehler beim Lesen der Spielinformation</string>
+    <string name="e_loadinginfo2">Fehler beim Lesen der Spielinformation (%1$s)</string>
+    <string name="e_obtainingsession">Fehler beim Anmelden</string>
+    <string name="e_parsingjson">Fehler \'could not parse json result\'</string>
+    <string name="hint_username">Bitte gib einen Spielernamen an</string>
+    <string name="hint_password">Bitte gib ein Passwort an</string>
+    <string name="username_init_txt">[Bitte gib einen Spielernamen an]</string>
+    <string name="interval_no">kein automatischer Reload</string>
+    <string name="interval_set">Reload nach %1$s</string>
+    <string name="mitem_settings">Einstellungen</string>
+    <string name="noti_total_plu">%1$d laufende Spiele</string>
+    <string name="noti_total_sin">%1$d laufendes Spiel</string>
+    <string name="noti_waiting_sin">%1$d Spiel am Zug</string>
+    <string name="noti_waiting_plu">%1$d Spiele am Zug</string>
+    <string name="password_nopw">noch kein Passwort gesetzt</string>
+    <string name="password_set">Passwort gesetzt</string>
+    <string name="pers_invites">Persönliche Einladungen</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="total_games">Deine laufenden Spiele</string>
+    <string name="username_cont_desc">Spielername</string>
+    <string name="waiting_games">Spiele am Zug</string>
+    <string name="noti_title">Sende Benachrichtigungen</string>
+    <string name="noti_off">keine Benachrichtigungen</string>
+    <string name="noti_on">sende Benachrichtigungen</string>
+    <string name="username_title">Yucata Spielername</string>
+    <string name="password_title">Yucata Passwort</string>
+    <string name="interval_title">Interval für auto-Reload</string>
+    <string name="polling_intervals_120">2 Stunden</string>
+    <string name="polling_intervals_1440">24 Stunden</string>
+    <string name="polling_intervals_15">15 Minuten</string>
+    <string name="polling_intervals_30">30 Minuten</string>
+    <string name="polling_intervals_45">45 Minuten</string>
+    <string name="polling_intervals_480">8 Stunden</string>
+    <string name="polling_intervals_60">1 Stunde</string>
+    <string name="polling_intervals_720">12 Stunden</string>
+    <string name="polling_intervals_never">nie</string>
+</resources>

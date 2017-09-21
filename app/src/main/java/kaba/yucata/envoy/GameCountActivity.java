@@ -176,7 +176,7 @@ public class GameCountActivity extends AppCompatActivity
         try {
             new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
         } catch (CommunicationException.NoSessionException e) {
-            Toast.makeText(this,"error obtaining session\n"+e.toString(),Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getString(R.string.e_obtainingsession)+"\n"+e.toString(),Toast.LENGTH_LONG).show();
             // FIXME: invalidate pref data ...
         }
     }

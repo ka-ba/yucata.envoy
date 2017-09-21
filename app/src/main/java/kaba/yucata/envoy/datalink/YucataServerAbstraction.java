@@ -24,6 +24,7 @@ import java.util.Scanner;
 
 import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.PrefsHelper;
+import kaba.yucata.envoy.R;
 
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_SECRET;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_SESSION_ID;
@@ -87,10 +88,10 @@ public class YucataServerAbstraction extends ServerAbstraction {
     public SessionAbstraction requestSession() throws ConfigurationException, SecurityException {
         final String username = sharedPrefs.getString(PREF_KEY_USERNAME, null);
         if( (username==null) || (username.isEmpty()) )
-            throw new ConfigurationException("please configure a username");
+            throw new ConfigurationException(context.getString(R.string.hint_username));
         final String password = sharedPrefs.getString(PREF_KEY_SECRET, null);
         if( (password==null) || (password.isEmpty()) )
-            throw new ConfigurationException("please configure a password");
+            throw new ConfigurationException(context.getString(R.string.hint_password));
         PrefsHelper.clearSessionPrefs(sharedPrefs);
         HttpURLConnection connection=null;
         try {
@@ -133,7 +134,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
                 System.out.println("received session tokens:\n session: "+session_id+"\n yucata: "+token);
             }
         } catch (IOException e) {
-            throw new CommunicationException("cannot obtain session",e);  // FIXME: more specific exception?
+            throw new CommunicationException(context.getString(R.string.e_obtainingsession),e);  // FIXME: more specific exception?
         } finally {
             if(connection!=null)
                 connection.disconnect();
@@ -184,13 +185,13 @@ public class YucataServerAbstraction extends ServerAbstraction {
             // receive
             final int responseCode = connection.getResponseCode();
             if( (responseCode<200) || (responseCode>299) )
-                throw new SecurityException("could not load game information ("+responseCode+")");
+                throw new SecurityException( context.getString(R.string.e_loadinginfo2,responseCode) );
             final String json_str = readStreamToString(connection.getInputStream());
             return parseJSON(y_session,json_str);
         } catch (JSONException e) {
-            throw new CommunicationException("could not parse json result",e);  // FIXME: specialized Exc.?
+            throw new CommunicationException(context.getString(R.string.e_parsingjson),e);  // FIXME: specialized Exc.?
         } catch (IOException e) {
-            throw new CommunicationException("could not load games info",e);  // FIXME: specialized Exc.?
+            throw new CommunicationException(context.getString(R.string.e_loadinginfo),e);  // FIXME: specialized Exc.?
         } finally {
             if(connection!=null)
                 connection.disconnect();

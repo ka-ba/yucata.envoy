@@ -71,7 +71,7 @@ public class PrefsHelper {
             return Integer.parseInt(pref);
         } catch(NumberFormatException e) {
             if(context!=null)
-                Toast.makeText(context,"cannot parse to int: "+pref+" ("+key+") using defualt: "+def,Toast.LENGTH_LONG).show();
+                Toast.makeText(context, String.format("cannot parse to int: %s (%s) using default: %d",pref,key,def),Toast.LENGTH_LONG).show();
         }
         return def;
     }
