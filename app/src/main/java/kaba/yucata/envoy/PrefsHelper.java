@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.widget.Toast;
 
+import kaba.yucata.envoy.datalink.CommunicationException;
+
 /**
  * Created by kaba on 08/09/17.
  */
@@ -22,6 +24,19 @@ public class PrefsHelper {
     public static final String PREF_KEY_SESSION_ID = "session";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     public static final String PREF_KEY_TIME_LAST_LOAD = "last_load_time_stamp";
+
+    public static final String PREF_KEY_STATE_USERNAME = "state_username";
+    private static final int PREF_VALUE_S_UN_UNKNOWN  = 11;
+    private static final int PREF_VALUE_S_UN_CHANGED  = 12;
+    private static final int PREF_VALUE_S_UN_FAILED   = 13;
+    private static final int PREF_VALUE_S_UN_ACCEPTED = 14;
+    private static final int PREF_VALUE_S_UN_REJECTED = 15;
+    public static final String PREF_KEY_STATE_PASSWORD = "state_password";
+    private static final int PREF_VALUE_S_PW_UNKNOWN  = 21;
+    private static final int PREF_VALUE_S_PW_CHANGED  = 22;
+    private static final int PREF_VALUE_S_PW_FAILED   = 23;
+    private static final int PREF_VALUE_S_PW_ACCEPTED = 24;
+    private static final int PREF_VALUE_S_PW_REJECTED = 25;
 
     public static void clearSessionPrefs(SharedPreferences sharedPrefs) {
         clearPrefs( sharedPrefs, PREF_KEY_SESSION_ID, PREF_KEY_YUCATA_TOKEN, PREF_KEY_TOKEN_BASE64 );
@@ -74,5 +89,76 @@ public class PrefsHelper {
                 Toast.makeText(context,"cannot parse to int: "+pref+" ("+key+") using defualt: "+def,Toast.LENGTH_LONG).show();
         }
         return def;
+    }
+
+    public static void interpretLoadError(SharedPreferences sharedPrefs, Throwable throwable) {
+        if(throwable instanceof ConfigurationException) {
+            // TODO: haeh?
+        } else if(throwable instanceof CommunicationException.LoginFailedException) {
+            final int state_username = sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,PREF_VALUE_S_UN_UNKNOWN);
+            switch(state_username) {
+                case PREF_VALUE_S_UN_UNKNOWN:
+                case PREF_VALUE_S_UN_CHANGED:
+                    sharedPrefs.edit()
+                            .putInt(PREF_KEY_STATE_USERNAME,PREF_VALUE_S_UN_FAILED)
+                            .putInt(PREF_KEY_STATE_PASSWORD,PREF_VALUE_S_PW_FAILED).apply();
+                    return;
+                case PREF_VALUE_S_UN_ACCEPTED:
+                    final int state_password = sharedPrefs.getInt(PREF_KEY_STATE_PASSWORD,PREF_VALUE_S_PW_UNKNOWN);
+                    switch (state_password) {
+                        case PREF_VALUE_S_PW_UNKNOWN:
+                        case PREF_VALUE_S_PW_CHANGED:
+                            sharedPrefs.edit()
+                                    .putInt(PREF_KEY_STATE_PASSWORD,PREF_VALUE_S_PW_REJECTED).apply();
+                            return;
+                        case PREF_VALUE_S_PW_ACCEPTED:
+                            sharedPrefs.edit()
+                                    .putInt(PREF_KEY_STATE_USERNAME,PREF_VALUE_S_UN_FAILED)
+                                    .putInt(PREF_KEY_STATE_PASSWORD,PREF_VALUE_S_PW_FAILED).apply();
+                            return;
+                    }
+            }
+            return;
+        }
+        // do nothoing on CE.IOException
+        // FIXME: do someting about session exceptions?
+        // TODO: implement correct reaction to internal error
+    }
+
+    public static void prefChangeUsername(SharedPreferences sharedPrefs) {
+        sharedPrefs.edit()
+                .putInt( PREF_KEY_STATE_USERNAME, PREF_VALUE_S_UN_CHANGED )
+                .putInt( PREF_KEY_STATE_PASSWORD, PREF_VALUE_S_PW_UNKNOWN ).apply();
+        // session prefs handeled in clearPrefsBecausePrefChange
+    }
+
+    public static void prefChangePassword(SharedPreferences sharedPrefs) {
+        final int state_username = sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,PREF_VALUE_S_UN_UNKNOWN);
+        final SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putInt( PREF_KEY_STATE_PASSWORD, PREF_VALUE_S_PW_CHANGED );
+        if( (state_username==PREF_VALUE_S_UN_FAILED) || (state_username==PREF_VALUE_S_UN_REJECTED) )
+            editor.putInt( PREF_KEY_STATE_USERNAME, PREF_VALUE_S_UN_UNKNOWN );
+        editor.apply();
+        // session prefs handeled in clearPrefsBecausePrefChange
+    }
+
+    public static boolean canReload(SharedPreferences sharedPrefs) {
+        String s = sharedPrefs.getString(PREF_KEY_USERNAME,null);
+        if( (s==null) || (s.isEmpty()) )
+            return false;
+        s = sharedPrefs.getString(PREF_KEY_SECRET,null);
+        if( (s==null) || (s.isEmpty()) )
+            return false;
+        switch( sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,-1)) {
+            case PREF_VALUE_S_UN_FAILED:
+            case PREF_VALUE_S_UN_REJECTED:
+                return false;
+        }
+        switch( sharedPrefs.getInt(PREF_KEY_STATE_PASSWORD,-1)) {
+            case PREF_VALUE_S_PW_FAILED:
+            case PREF_VALUE_S_PW_ACCEPTED:
+                return false;
+        }
+        return true;
     }
 }

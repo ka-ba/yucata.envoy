@@ -18,5 +18,6 @@
 
     <string name="polling_intervals_minutes_never">999999</string>
     <string name="polling_intervals_minutes_15">15</string>
+    <string name="button_reload_disabled">no reloads</string>
 
 </resources>

@@ -10,8 +10,8 @@ import android.os.AsyncTask;
 import android.support.v7.app.NotificationCompat;
 import android.widget.Toast;
 
-import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.GameCountActivity;
+import kaba.yucata.envoy.PrefsHelper;
 import kaba.yucata.envoy.R;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
@@ -37,14 +37,12 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
     @Override
     protected StateInfo doInBackground(Context... contextA) {
         final Context context = contextA[0];
-        final ServerAbstraction server = new YucataServerAbstraction(context);
-        StateInfo info=null;
         try {
-            info = server.coldCallLoadInfo();
-            return info;
-        } catch (ConfigurationException e) {
+            final ServerAbstraction server = new YucataServerAbstraction(context);
+            return server.coldCallLoadInfo();
+        } catch (Throwable e) {
             e.printStackTrace();
-            return new StateInfo(e.toString());
+            return new StateInfo(e);
         }
     }
     @Override
@@ -56,6 +54,8 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
                     .putInt(PREF_KEY_INVITES, info.getPersonalInvites())
                     .putLong(PREF_KEY_TIME_LAST_LOAD,System.currentTimeMillis())
                     .apply();
+        } else {  // was erronous
+            PrefsHelper.interpretLoadError(sharedPrefs,info.getThrowable());
         }
     }
     // ... invalidateSession...
@@ -67,11 +67,10 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
         @Override
         protected void onPostExecute(StateInfo info) {
             super.onPostExecute(info);
-            if( ! info.wasErronous() ) {
-                ((GameCountActivity)context).setState(STATE_OK);
-            } else {
-                Toast.makeText(context, "LTA error obtaining session\n"+info.getErrorMessage(), Toast.LENGTH_LONG).show();
-                ((GameCountActivity)context).setState(STATE_ERROR);
+            if( info.wasErronous() ) {
+                Toast.makeText(context, "LTA error obtaining session\n"+info.getThrowable(), Toast.LENGTH_LONG).show();
+                PrefsHelper.interpretLoadError(sharedPrefs,info.getThrowable());
+//                ((GameCountActivity)context).setState(STATE_ERROR);
             }
         }
     }

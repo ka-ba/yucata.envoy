@@ -76,15 +76,11 @@ public class YucataServerAbstraction extends ServerAbstraction {
 
     @Override @NonNull
     public SessionAbstraction recoverSession() throws ConfigurationException,CommunicationException.NoSessionException {
-        try {
             return new YucataSession();
-        } catch (IllegalStateException e) {
-            throw new CommunicationException.NoSessionException("no session data to recover",e);
-        }
     }
 
     @Override @NonNull
-    public SessionAbstraction requestSession() throws ConfigurationException, SecurityException {
+    public SessionAbstraction requestSession() throws ConfigurationException, CommunicationException {
         final String username = sharedPrefs.getString(PREF_KEY_USERNAME, null);
         if( (username==null) || (username.isEmpty()) )
             throw new ConfigurationException("please configure a username");
@@ -98,6 +94,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
             connection = (HttpURLConnection) LOGIN_URL.openConnection();
             connection.setRequestProperty("Content-Type","multipart/form-data; boundary="+MP_BOUNDARY);
             connection.setRequestProperty("Referer",LOGIN_URL_S);
+            connection.setRequestProperty("User-Agent","YucataEnvoy");
             connection.setInstanceFollowRedirects(false);
             final String post = String.format(POST,username,password);  // FIXME: introduce MultipartHelper!?
             connection.setDoOutput(true);
@@ -127,13 +124,13 @@ public class YucataServerAbstraction extends ServerAbstraction {
                 printHeaders(System.out, connection.getHeaderFields());
             }
             if( (session_id==null) || (token==null) )
-                throw new SecurityException("login failed ("+connection.getResponseCode()+")");  // FIXME: subclass CommunicationExc.?
+                throw new CommunicationException.LoginFailedException("login failed ("+connection.getResponseCode()+")");  // FIXME: subclass CommunicationExc.?
             PrefsHelper.setStrings( sharedPrefs, PREF_KEY_SESSION_ID, session_id, PREF_KEY_YUCATA_TOKEN, token );
             if(true&&DEBUG) {
                 System.out.println("received session tokens:\n session: "+session_id+"\n yucata: "+token);
             }
         } catch (IOException e) {
-            throw new CommunicationException("cannot obtain session",e);  // FIXME: more specific exception?
+            throw new CommunicationException.IOException("cannot obtain session",e);  // FIXME: more specific exception?
         } finally {
             if(connection!=null)
                 connection.disconnect();
@@ -169,7 +166,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
     }
 
     @Override
-    public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, SecurityException, ConfigurationException {
+    public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, ConfigurationException {
         final YucataSession y_session = (YucataSession) session;
         HttpURLConnection connection=null;
         try {
@@ -177,6 +174,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
             connection = (HttpURLConnection) GETGAMES_URL.openConnection();
             connection.setRequestProperty("Accept","application/json");
             connection.setRequestProperty("Referer",GETGAMES_REFERER);
+            connection.setRequestProperty("User-Agent","YucataEnvoy");
             connection.setRequestProperty("Cookie",y_session.getCookieHeaderValue());
             // todo: set User-Agent (and test if overridden..)
             connection.setDoOutput(true);  // zero length post
@@ -184,13 +182,13 @@ public class YucataServerAbstraction extends ServerAbstraction {
             // receive
             final int responseCode = connection.getResponseCode();
             if( (responseCode<200) || (responseCode>299) )
-                throw new SecurityException("could not load game information ("+responseCode+")");
+                throw new CommunicationException.IOException("could not load game information ("+responseCode+")"); // TODO: decide about more specialized exception
             final String json_str = readStreamToString(connection.getInputStream());
             return parseJSON(y_session,json_str);
         } catch (JSONException e) {
             throw new CommunicationException("could not parse json result",e);  // FIXME: specialized Exc.?
         } catch (IOException e) {
-            throw new CommunicationException("could not load games info",e);  // FIXME: specialized Exc.?
+            throw new CommunicationException.IOException("could not load games info",e);
         } finally {
             if(connection!=null)
                 connection.disconnect();
@@ -245,13 +243,13 @@ public class YucataServerAbstraction extends ServerAbstraction {
         private final String yucataToken;
         private int userId=-1;
         YucataSession()
-                throws /*ConfigurationException,*/ IllegalStateException {
+                throws CommunicationException.NoSessionException {
             sessionId = sharedPrefs.getString(PREF_KEY_SESSION_ID, null);
             if( (sessionId==null) || (sessionId.isEmpty()) )
-                throw new IllegalStateException("no current session");
+                throw new CommunicationException.NoSessionException("no current session");
             yucataToken = sharedPrefs.getString(PREF_KEY_YUCATA_TOKEN, null);
             if( (yucataToken==null) || (yucataToken.isEmpty()) )
-                throw new IllegalStateException("no current authentication token");
+                throw new CommunicationException.NoSessionException("no current authentication token");
             userId = sharedPrefs.getInt(PREF_KEY_USER_ID,-1);
             if(true&&DEBUG) {
                 System.out.println("new session object:\n session: "+sessionId+"\n yucata: "+yucataToken+"\n userid: "+userId);

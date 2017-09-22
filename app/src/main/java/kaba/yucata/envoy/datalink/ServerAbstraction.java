@@ -13,10 +13,10 @@ import kaba.yucata.envoy.ConfigurationException;
 public abstract class ServerAbstraction {
     private final static boolean DEBUG=true;
     abstract public @NonNull SessionAbstraction recoverSession() throws ConfigurationException, CommunicationException.NoSessionException;
-    abstract public @NonNull SessionAbstraction requestSession() throws ConfigurationException, SecurityException, CommunicationException;
-    abstract public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, SecurityException, ConfigurationException;
+    abstract public @NonNull SessionAbstraction requestSession() throws ConfigurationException, CommunicationException;
+    abstract public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, ConfigurationException;
 
-    public StateInfo coldCallLoadInfo(SessionAbstraction session) throws IOException, SecurityException, ConfigurationException {
+    public StateInfo coldCallLoadInfo(SessionAbstraction session) throws ConfigurationException, CommunicationException {
         if(session==null)
             return coldCallLoadInfo();
         try {
@@ -29,7 +29,7 @@ public abstract class ServerAbstraction {
         }
     }
 
-    public StateInfo coldCallLoadInfo() throws SecurityException, ConfigurationException {
+    public StateInfo coldCallLoadInfo() throws ConfigurationException, CommunicationException {
         SessionAbstraction session;
         try {
             session = recoverSession();

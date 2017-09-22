@@ -46,7 +46,7 @@ class DummyServerAbstraction extends ServerAbstraction {
     @NonNull
     @Override
     public ServerAbstraction.SessionAbstraction recoverSession()
-            throws ConfigurationException {
+            throws ConfigurationException, CommunicationException.NoSessionException {
         try {
             return new DummySession(false);
         } catch (IllegalStateException e) { // if no secret known from previous exchanges
@@ -57,7 +57,7 @@ class DummyServerAbstraction extends ServerAbstraction {
     @NonNull
     @Override
     public SessionAbstraction requestSession()
-            throws ConfigurationException, SecurityException { // FIXME: really SecExc?
+            throws ConfigurationException, CommunicationException.NoSessionException { // FIXME: really SecExc?
         final DummySession session = new DummySession(false);
         try {
             loadWithCommand(session,"token");
@@ -69,12 +69,12 @@ class DummyServerAbstraction extends ServerAbstraction {
 
     @Override
     public StateInfo loadInfo(@NonNull SessionAbstraction session) throws
-            CommunicationException, SecurityException, ConfigurationException {
+            CommunicationException, ConfigurationException {
         return loadWithCommand((DummySession) session, "state" );
     }
 
     private StateInfo loadWithCommand(DummySession session, String rest_cmd)
-            throws CommunicationException, SecurityException, ConfigurationException {
+            throws CommunicationException, ConfigurationException {
         HttpURLConnection urlConnection=null;
         int responseCode=666;
         final String secret = session.getSecret();
@@ -121,7 +121,7 @@ class DummyServerAbstraction extends ServerAbstraction {
                 // a problem ... handle response codes we _can_ handle
                 case 401:
                     // wrong token
-                    throw new SecurityException("token mismatch");
+                    throw new CommunicationException.IllegalSessionException("token mismatch");
                     // break;
                 case 404:
                     // wrong username

@@ -26,11 +26,13 @@ public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener
 {
+    public final boolean DEBUG=true;
     private static final long RELOAD_WAIT_MILLIS = 120000;  // TODO: 300000 = 5 min better / necessary?
     private CountDownTimer reloadCountdown=null;
 
     public enum STATES { STATE_OK,STATE_ERROR};
     private STATES state;
+    private boolean buttonErrorHidden=false;
     private DataService dataService=null;
     private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites;
     private Button bReload;
@@ -51,6 +53,10 @@ public class GameCountActivity extends AppCompatActivity
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         // initialize display fields
         refreshDisplayedValues();
+        if( PrefsHelper.canReload(sharedPrefs) )
+            releaseButtonFromError();
+        else
+            hideButtonDueToError();
         // listen for changes
         sharedPrefs.registerOnSharedPreferenceChangeListener(this);
         dataService = DataService.getService(this, 999999);  // FIXME: eliminate interval from constructor?
@@ -113,25 +119,30 @@ public class GameCountActivity extends AppCompatActivity
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        boolean sesion_invalid=false;
         if( PrefsHelper.PREF_KEY_GAMES_WAITING.equals(key))
             showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPreferences);
         else if( PrefsHelper.PREF_KEY_GAMES_TOTAL.equals(key))
             showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPreferences);
         else if( PrefsHelper.PREF_KEY_INVITES.equals(key))
             showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPreferences);
+
         else if( PrefsHelper.PREF_KEY_USERNAME.equals(key)) {
-            sesion_invalid=true;
             tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
-        } else if( PrefsHelper.PREF_KEY_SECRET.equals(key))
-            sesion_invalid=true;
-        else if( PrefsHelper.PREF_KEY_INTERVAL_MIN.equals(key)) {
+            PrefsHelper.prefChangeUsername(sharedPreferences);
+        } else if( PrefsHelper.PREF_KEY_SECRET.equals(key)) {
+            PrefsHelper.prefChangePassword(sharedPreferences);
+        } else if( PrefsHelper.PREF_KEY_INTERVAL_MIN.equals(key))
             setDataServiceInterval();
-        } else if( PrefsHelper.PREF_KEY_TIME_LAST_LOAD.equals(key))
+
+        else if( PrefsHelper.PREF_KEY_TIME_LAST_LOAD.equals(key))
             hideButtonByCountdown();
-        if( PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key) ) {  // FIXME: sensible now? infinite loop danger?
-        }
-// FIXME: do sumthin sensible here...                if (loaderHelper != null)
+
+        PrefsHelper.clearPrefsBecausePrefChanged(sharedPreferences,key);
+
+        if( PrefsHelper.canReload(sharedPreferences) )
+            releaseButtonFromError();
+        else
+            hideButtonDueToError();
     }
 
     private void refreshDisplayedValues() {
@@ -173,15 +184,12 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void loadInfo() {
-        try {
-            new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
-        } catch (CommunicationException.NoSessionException e) {
-            Toast.makeText(this,"error obtaining session\n"+e.toString(),Toast.LENGTH_LONG).show();
-            // FIXME: invalidate pref data ...
-        }
+        if(true&&DEBUG) System.out.println("loading info");
+        new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
     }
 
     private void hideButtonByCountdown() {
+        if(true&&DEBUG) System.out.println("hiding button by countdown");
         final long tload = sharedPrefs.getLong(PREF_KEY_TIME_LAST_LOAD, 1L);
         final long tdiff = tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
         if( tdiff >= 2000 ) {
@@ -206,13 +214,38 @@ public class GameCountActivity extends AppCompatActivity
         stopButtonCountdown(true);
     }
     private void stopButtonCountdown( boolean stop_timer ) {
-        if(stop_timer) {
-            if(reloadCountdown!=null) {
-                reloadCountdown.cancel();
-                reloadCountdown = null;
-            }
+        if(true&&DEBUG) System.out.println("stopping countdown");
+        if(stop_timer)
+            stopCountdownTimer();
+        if( ! buttonErrorHidden ) {
+            bReload.setText(R.string.button_reload);
+            bReload.setEnabled(true);
         }
-        bReload.setText( R.string.button_reload );
-        bReload.setEnabled(true);
     }
+
+    private void stopCountdownTimer() {
+        if(true&&DEBUG) System.out.println("stopping countdown timer");
+        if(reloadCountdown!=null) {
+            reloadCountdown.cancel();
+            reloadCountdown = null;
+        }
+    }
+
+    private void hideButtonDueToError() {
+        if(true&&DEBUG) System.out.println("hiding button due to error");
+        buttonErrorHidden=true;
+        stopCountdownTimer();
+        bReload.setText( R.string.button_reload_disabled );
+        bReload.setEnabled(false);
+    }
+
+    private void releaseButtonFromError() {
+        if(true&&DEBUG) System.out.println("releasing button from error");
+        buttonErrorHidden=false;
+        if(reloadCountdown==null) {
+            bReload.setText( R.string.button_reload );
+            bReload.setEnabled(true);
+        }
+    }
+
 }

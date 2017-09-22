@@ -9,7 +9,7 @@ public class StateInfo {
     final private int gamesWaiting;
     final private int personalInvites;
     final private boolean error;
-    final private String errorMessage;
+    final private Throwable throwable;
     private ServerAbstraction.SessionAbstraction session=null;
 
     /** to be used in good time */
@@ -18,16 +18,16 @@ public class StateInfo {
         gamesWaiting=waiting;
         personalInvites=invites;
         error=false;
-        errorMessage=null;
+        throwable =null;
     }
 
     /** to be used in bad time */
-    public StateInfo(String msg) {
+    public StateInfo(Throwable t) {
         gamesTotal=-1;
         gamesWaiting=-1;
         personalInvites=-1;
         error=true;
-        errorMessage=msg;
+        throwable =t;
     }
 
     public int getGamesTotal() {
@@ -44,7 +44,7 @@ public class StateInfo {
 
     public boolean wasErronous() { return error; }
 
-    public String getErrorMessage() {return errorMessage; }
+    public Throwable getThrowable() {return throwable; }
 
     public void setSession(ServerAbstraction.SessionAbstraction session) {
         this.session = session;
