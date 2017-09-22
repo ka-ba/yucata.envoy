@@ -4,24 +4,23 @@
     <EditTextPreference
         android:key="@string/k_pref_username"
         android:singleLine="true"
-        android:title="Yucata Username" />
+        android:title="@string/username_title" />
     <EditTextPreference
-        android:contentDescription="secret provided by Yucata"
         android:editable="true"
         android:inputType="text|textNoSuggestions|textVisiblePassword"
         android:key="@string/k_pref_password"
         android:singleLine="true"
-        android:title="Yucata Envoy Secret" />
+        android:title="@string/password_title" />
     <ListPreference
         android:defaultValue="60"
         android:entries="@array/polling_intervals"
         android:entryValues="@array/polling_intervals_minutes"
         android:key="@string/k_pref_interval_min"
-        android:title="Automatic update interval" />
+        android:title="@string/interval_title" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/k_pref_notifications"
-        android:summaryOn="notify user"
-        android:summaryOff="no notifications"
-        android:title="Fire up Notifications"/>
+        android:summaryOn="@string/noti_on"
+        android:summaryOff="@string/noti_off"
+        android:title="@string/noti_title"/>
 </PreferenceScreen>

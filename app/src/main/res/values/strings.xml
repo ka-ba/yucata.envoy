@@ -6,18 +6,50 @@
     <string name="waiting_games">Games waiting</string>
     <string name="total_games">Games total</string>
     <string name="pers_invites">Personal invitations</string>
-    <string name="username_init_txt">[please configure a username]</string>
     <string name="button_reload">Reload</string>
-    <string name="username_cont_desc">username</string>
-
-    <!-- technical items: keys -->
-    <string name="k_pref_username">username</string>
-    <string name="k_pref_password">secret</string>
-    <string name="k_pref_interval_min">interval_minutes</string>
-    <string name="k_pref_notifications">fire_notifications</string>
-
-    <string name="polling_intervals_minutes_never">999999</string>
-    <string name="polling_intervals_minutes_15">15</string>
     <string name="button_reload_disabled">no reloads</string>
 
+    <string name="username_init_txt">[please configure a username]</string>
+    <string name="username_cont_desc">username</string>
+    <string name="username_title">Yucata Username</string>
+    <string name="noti_title">Fire up Notifications</string>
+    <string name="noti_on">notify user</string>
+    <string name="noti_off">no notifications</string>
+    <string name="noti_waiting_sin">%1$d game waiting for your move</string>
+    <string name="noti_waiting_plu">%1$d games waiting for your move</string>
+    <string name="noti_total_sin">out of %1$d games in total</string>
+    <string name="noti_total_plu">out of %1$d games in total</string>
+    <!-- string name="e_strpreftoint">cannot parse to int: %s (%s) using default: %d</string -->
+    <string name="password_set">Password set</string>
+    <string name="password_nopw">Pasword not specified</string>
+    <string name="password_title">Yucata Password</string>
+    <string name="interval_title">Automatic reload interval</string>
+    <string name="interval_no">no automatic reload</string>
+    <string name="interval_set">Interval set to %1$s</string>
+    <string name="hint_username">please configure a username</string>
+    <string name="hint_password">please configure a password</string>
+
+    <string name="polling_intervals_never">never</string>
+    <string name="polling_intervals_15">15 minutes</string>
+    <string name="polling_intervals_30">30 minutes</string>
+    <string name="polling_intervals_45">45 minutes</string>
+    <string name="polling_intervals_60">1 hour</string>
+    <string name="polling_intervals_120">2 hours</string>
+    <string name="polling_intervals_480">8 hours</string>
+    <string name="polling_intervals_720">12 hours</string>
+    <string name="polling_intervals_1440">24 hours</string>
+
+    <string name="e_obtainingsession">error obtaining session</string>
+    <string name="e_loadinginfo2">could not load game information (%1$s)</string>
+    <string name="e_loadinginfo">could not load games info</string>
+    <string name="e_parsingjson">could not parse json result</string>
+
+    <!-- technical items: keys -->
+    <string name="k_pref_username" translatable="false">username</string>
+    <string name="k_pref_password" translatable="false">secret</string>
+    <string name="k_pref_interval_min" translatable="false">interval_minutes</string>
+    <string name="k_pref_notifications" translatable="false">fire_notifications</string>
+
+    <string name="polling_intervals_minutes_never" translatable="false">999999</string>
+    <string name="polling_intervals_minutes_15" translatable="false">15</string>
 </resources>

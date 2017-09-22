@@ -103,10 +103,16 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
             }
             final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
             builder.setSmallIcon(R.drawable.ic_stat_notify)
-                    .setContentTitle( ""+waiting+(waiting==1?" game":" games")+" waiting for your move" )
-                    .setContentText("out of "+total+" games in total")
                     .setAutoCancel(true)
                     .setContentIntent(pendingIntent);
+            if(waiting==1)
+                builder.setContentTitle( context.getString(R.string.noti_waiting_sin,waiting) );
+            else
+                builder.setContentTitle( context.getString(R.string.noti_waiting_plu,waiting) );
+            if(total==1)
+                builder.setContentText( context.getString(R.string.noti_total_sin,total) );
+            else
+                builder.setContentText( context.getString(R.string.noti_total_plu,total) );
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                 builder.setCategory(Notification.CATEGORY_SOCIAL);
             }
