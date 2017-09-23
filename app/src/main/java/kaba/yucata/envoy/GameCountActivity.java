@@ -34,7 +34,7 @@ public class GameCountActivity extends AppCompatActivity
     private STATES state;
     private boolean buttonErrorHidden=false;
     private DataService dataService=null;
-    private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites;
+    private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites, tvState;
     private Button bReload;
     private SharedPreferences sharedPrefs;
 
@@ -49,6 +49,7 @@ public class GameCountActivity extends AppCompatActivity
         tvGamesTotal = (TextView) findViewById(R.id.tv_num_games_total);
         tvInvites = (TextView) findViewById(R.id.tv_num_pers_invites);
         bReload = (Button) findViewById(R.id.b_reload);
+        tvState = (TextView) findViewById(R.id.tv_state);
         bReload.setOnClickListener(this);
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         // initialize display fields
@@ -143,6 +144,7 @@ public class GameCountActivity extends AppCompatActivity
             releaseButtonFromError();
         else
             hideButtonDueToError();
+        updateStateTV();
     }
 
     private void refreshDisplayedValues() {
@@ -150,6 +152,7 @@ public class GameCountActivity extends AppCompatActivity
         showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPrefs);
         showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPrefs);
         showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPrefs);
+        updateStateTV();
     }
 
     private void showIntPrefInTV(TextView tv, String pref_key, SharedPreferences sharedPrefs) {
@@ -248,4 +251,12 @@ public class GameCountActivity extends AppCompatActivity
         }
     }
 
+    private void updateStateTV() {
+        final String state_text = PrefsHelper.getCurrentStateText(this,sharedPrefs);
+        tvState.setText( state_text );
+        if( (state_text==null) || (state_text.isEmpty()) )
+            tvState.setVisibility(View.INVISIBLE);
+        else
+            tvState.setVisibility(View.VISIBLE);
+    }
 }

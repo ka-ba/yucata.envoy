@@ -24,6 +24,7 @@ public class PrefsHelper {
     public static final String PREF_KEY_SESSION_ID = "session";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     public static final String PREF_KEY_TIME_LAST_LOAD = "last_load_time_stamp";
+    private static final String PREF_KEY_STATE_NETWORK_OK = "state_network_ok";
 
     public static final String PREF_KEY_STATE_USERNAME = "state_username";
     private static final int PREF_VALUE_S_UN_UNKNOWN  = 11;
@@ -92,6 +93,7 @@ public class PrefsHelper {
     }
 
     public static void interpretLoadError(SharedPreferences sharedPrefs, Throwable throwable) {
+        sharedPrefs.edit().putBoolean(PREF_KEY_STATE_NETWORK_OK,true).apply();
         if(throwable instanceof ConfigurationException) {
             // TODO: haeh?
         } else if(throwable instanceof CommunicationException.LoginFailedException) {
@@ -119,10 +121,32 @@ public class PrefsHelper {
                     }
             }
             return;
+        } else if(throwable instanceof CommunicationException.IOException) {
+            sharedPrefs.edit().putBoolean(PREF_KEY_STATE_NETWORK_OK,false).apply();
         }
-        // do nothoing on CE.IOException
         // FIXME: do someting about session exceptions?
         // TODO: implement correct reaction to internal error
+    }
+
+    public static void rememberLoginSuccess(SharedPreferences sharedPrefs) {
+        sharedPrefs.edit()
+                .putBoolean(PREF_KEY_STATE_NETWORK_OK,true)
+                .putInt(PREF_KEY_STATE_USERNAME,PREF_VALUE_S_UN_ACCEPTED)
+                .putInt(PREF_KEY_STATE_PASSWORD,PREF_VALUE_S_PW_ACCEPTED).apply();
+
+    }
+
+    public static String getCurrentStateText(Context context, SharedPreferences sharedPrefs) {
+        if( isStringPrefNullEmpty(sharedPrefs,PREF_KEY_USERNAME)
+                || isStringPrefNullEmpty(sharedPrefs,PREF_KEY_SECRET) )
+            return context.getString(R.string.s_missing_login_info);
+        if( PREF_VALUE_S_UN_FAILED == sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,-1) )
+            return context.getString(R.string.s_login_failed);
+        if( PREF_VALUE_S_PW_REJECTED == sharedPrefs.getInt(PREF_KEY_STATE_PASSWORD,-1) )
+            return context.getString(R.string.s_password_rejected);
+        if( !(sharedPrefs.getBoolean(PREF_KEY_STATE_NETWORK_OK,true)) )
+            return context.getString(R.string.s_network_failed);
+        return null;
     }
 
     public static void prefChangeUsername(SharedPreferences sharedPrefs) {
@@ -143,11 +167,9 @@ public class PrefsHelper {
     }
 
     public static boolean canReload(SharedPreferences sharedPrefs) {
-        String s = sharedPrefs.getString(PREF_KEY_USERNAME,null);
-        if( (s==null) || (s.isEmpty()) )
+        if( isStringPrefNullEmpty(sharedPrefs,PREF_KEY_USERNAME) )
             return false;
-        s = sharedPrefs.getString(PREF_KEY_SECRET,null);
-        if( (s==null) || (s.isEmpty()) )
+        if( isStringPrefNullEmpty(sharedPrefs,PREF_KEY_SECRET) )
             return false;
         switch( sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,-1)) {
             case PREF_VALUE_S_UN_FAILED:
@@ -160,5 +182,12 @@ public class PrefsHelper {
                 return false;
         }
         return true;
+    }
+
+    private static boolean isStringPrefNullEmpty(SharedPreferences sharedPrefs, String key) {
+        final String pref = sharedPrefs.getString(key,null);
+        if( (pref==null) || (pref.isEmpty()) )
+            return true;
+        return false;
     }
 }

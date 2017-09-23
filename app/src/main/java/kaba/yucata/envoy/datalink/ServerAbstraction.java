@@ -1,10 +1,14 @@
 package kaba.yucata.envoy.datalink;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v7.preference.PreferenceManager;
 
 import java.io.IOException;
 
 import kaba.yucata.envoy.ConfigurationException;
+import kaba.yucata.envoy.PrefsHelper;
 
 /**
  * Created by kaba on 03/09/17.
@@ -12,6 +16,12 @@ import kaba.yucata.envoy.ConfigurationException;
 
 public abstract class ServerAbstraction {
     private final static boolean DEBUG=true;
+    public final Context context;
+    public final SharedPreferences sharedPrefs;
+    protected ServerAbstraction(Context context) {
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        this.context=context;
+    }
     abstract public @NonNull SessionAbstraction recoverSession() throws ConfigurationException, CommunicationException.NoSessionException;
     abstract public @NonNull SessionAbstraction requestSession() throws ConfigurationException, CommunicationException;
     abstract public StateInfo loadInfo(@NonNull SessionAbstraction session) throws CommunicationException, ConfigurationException;
@@ -23,6 +33,7 @@ public abstract class ServerAbstraction {
             return loadInfo(session);
         } catch(SecurityException e) {  // session invalid => try the full cycle exactly once
             session = requestSession();
+            PrefsHelper.rememberLoginSuccess(sharedPrefs);
             final StateInfo info = loadInfo(session);
             info.setSession(session);
             return info;
@@ -40,6 +51,7 @@ public abstract class ServerAbstraction {
             if(true&&DEBUG)
                 System.out.println("retrying fetch because of "+e.toString());
             session = requestSession();
+            PrefsHelper.rememberLoginSuccess(sharedPrefs);
             final StateInfo info = loadInfo(session);
             info.setSession(session);
             return info;

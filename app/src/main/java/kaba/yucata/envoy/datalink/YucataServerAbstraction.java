@@ -57,16 +57,13 @@ public class YucataServerAbstraction extends ServerAbstraction {
             "--"+MP_BOUNDARY+
             "\r\nContent-Disposition: form-data; name=\"ctl00$ctl07$edtPassword\"\r\n\r\n%s\r\n"+
             "--"+MP_BOUNDARY+"--\r\n";
-    public final Context context;
-    public final SharedPreferences sharedPrefs;
     public final URL LOGIN_URL;
     public final URL GETGAMES_URL;
 
     // FIXME: only public to test from service => return o default (no keyword)
     public YucataServerAbstraction(Context c)
             throws Error {
-        context=c;
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        super(c);
         try {
             LOGIN_URL=new URL(LOGIN_URL_S);
             GETGAMES_URL=new URL(GETGAMES_URL_S);
@@ -184,7 +181,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
             final int responseCode = connection.getResponseCode();
             if( (responseCode<200) || (responseCode>299) )
                 throw new CommunicationException.IOException( context.getString(R.string.e_loadinginfo2,responseCode) );
-            final String json_str = readStreamToString(connection.getInputStream());
+^            final String json_str = readStreamToString(connection.getInputStream());
             return parseJSON(y_session,json_str);
         } catch (JSONException e) {
             throw new CommunicationException(context.getString(R.string.e_parsingjson),e);  // FIXME: specialized Exc.?

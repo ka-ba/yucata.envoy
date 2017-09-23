@@ -53,11 +53,16 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
                     ? getString(R.string.password_nopw) : getString(R.string.password_set) );
         // polling interval
         } else if(pref.getKey().equals( getString(R.string.k_pref_interval_min) )) {
-            final String sval = (String) val;
-            final ListPreference lpref = (ListPreference) pref;
-            final CharSequence text = lpref.getEntries()[lpref.findIndexOfValue(sval)];
-            summary = ( (sval==null)||(sval.equals(getText(R.string.polling_intervals_minutes_never).toString()) )
-                    ? getString(R.string.interval_no) : getString(R.string.interval_set,text) );
+            try {
+                final String sval = (String) val;
+                final ListPreference lpref = (ListPreference) pref;
+                final CharSequence text = lpref.getEntries()[lpref.findIndexOfValue(sval)];
+                summary = ((sval == null) || (sval.equals(getText(R.string.polling_intervals_minutes_never).toString()))
+                        ? getString(R.string.interval_no) : getString(R.string.interval_set, text));
+            } catch (ArrayIndexOutOfBoundsException e) {
+                e.printStackTrace();
+                summary="";
+            }
         }
         if(summary!=null) {
             pref.setSummary(summary);

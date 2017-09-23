@@ -7,7 +7,7 @@
     <string name="total_games">Games total</string>
     <string name="pers_invites">Personal invitations</string>
     <string name="button_reload">Reload</string>
-    <string name="button_reload_disabled">no reloads</string>
+    <string name="button_reload_disabled">no reload</string>
 
     <string name="username_init_txt">[please configure a username]</string>
     <string name="username_cont_desc">username</string>
@@ -52,4 +52,8 @@
 
     <string name="polling_intervals_minutes_never" translatable="false">999999</string>
     <string name="polling_intervals_minutes_15" translatable="false">15</string>
+    <string name="s_missing_login_info">incomplete login information</string>
+    <string name="s_login_failed">login failed</string>
+    <string name="s_password_rejected">password rejected</string>
+    <string name="s_network_failed">couldn\'t connect to server</string>
 </resources>

@@ -31,15 +31,11 @@ import static kaba.yucata.envoy.LocalConsts.BASEURL;
  */
 
 class DummyServerAbstraction extends ServerAbstraction {
-
-    private final Context context;
-    private final SharedPreferences sharedPrefs;
     private final MessageDigest digest;
 
     DummyServerAbstraction(Context c)
             throws NoSuchAlgorithmException {
-        context=c;
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+        super(c);
         digest = MessageDigest.getInstance("SHA-256");
     }
 

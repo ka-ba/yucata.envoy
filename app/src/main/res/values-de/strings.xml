@@ -37,4 +37,9 @@
     <string name="polling_intervals_60">1 Stunde</string>
     <string name="polling_intervals_720">12 Stunden</string>
     <string name="polling_intervals_never">nie</string>
+    <string name="button_reload_disabled">kein Reload</string>
+    <string name="s_login_failed">Login fehlgeschlagen</string>
+    <string name="s_missing_login_info">unvollständige Anmeldeinformationen</string>
+    <string name="s_network_failed">keine Verbindung zum Server</string>
+    <string name="s_password_rejected">Password nicht akzeptiert</string>
 </resources>
