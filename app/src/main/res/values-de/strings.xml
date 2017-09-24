@@ -42,4 +42,7 @@
     <string name="s_missing_login_info">unvollständige Anmeldeinformationen</string>
     <string name="s_network_failed">keine Verbindung zum Server</string>
     <string name="s_password_rejected">Password nicht akzeptiert</string>
+    <string name="button_reload">Reload</string>
+    <string name="mitem_diagnostic">Diagnose</string>
+    <string name="title_activity_diagnostic">Diagnose</string>
 </resources>

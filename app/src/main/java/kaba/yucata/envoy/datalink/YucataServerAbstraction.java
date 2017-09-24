@@ -181,7 +181,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
             final int responseCode = connection.getResponseCode();
             if( (responseCode<200) || (responseCode>299) )
                 throw new CommunicationException.IOException( context.getString(R.string.e_loadinginfo2,responseCode) );
-^            final String json_str = readStreamToString(connection.getInputStream());
+            final String json_str = readStreamToString(connection.getInputStream());
             return parseJSON(y_session,json_str);
         } catch (JSONException e) {
             throw new CommunicationException(context.getString(R.string.e_parsingjson),e);  // FIXME: specialized Exc.?

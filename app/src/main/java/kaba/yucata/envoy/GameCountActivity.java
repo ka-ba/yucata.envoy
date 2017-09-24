@@ -12,11 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import kaba.yucata.envoy.datalink.CommunicationException;
 import kaba.yucata.envoy.datalink.LoaderTask;
 import kaba.yucata.envoy.service.DataService;
+import kaba.yucata.envoy.util.DebugHelper;
+import kaba.yucata.envoy.util.DiagnosticActivity;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INTERVAL_MIN;
@@ -110,10 +110,15 @@ public class GameCountActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if( item.getItemId() == R.id.mitem_settings ) {
-            final Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
+        switch (item.getItemId()) {
+            case R.id.mitem_settings:
+                final Intent settings_intent = new Intent(this, SettingsActivity.class);
+                startActivity(settings_intent);
+                return true;
+            case R.id.mitem_diagnostic:
+                final Intent diagnostic_intent = new Intent(this, DiagnosticActivity.class);
+                startActivity(diagnostic_intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -187,17 +192,17 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void loadInfo() {
-        if(true&&DEBUG) System.out.println("loading info");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("loading info",4));
         new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
     }
 
     private void hideButtonByCountdown() {
-        if(true&&DEBUG) System.out.println("hiding button by countdown");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("hiding button by countdown",4));
         final long tload = sharedPrefs.getLong(PREF_KEY_TIME_LAST_LOAD, 1L);
-        final long tdiff = tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
-        if( tdiff >= 2000 ) {
+        final long t_to_wait = tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
+        if( t_to_wait >= 2000 ) {
             bReload.setEnabled(false);
-            reloadCountdown = new CountDownTimer(tdiff,1000) {
+            reloadCountdown = new CountDownTimer(t_to_wait,1000) {
                 @Override
                 public void onTick(long tleft) {
                     final long mleft = tleft / 60000;
@@ -217,7 +222,7 @@ public class GameCountActivity extends AppCompatActivity
         stopButtonCountdown(true);
     }
     private void stopButtonCountdown( boolean stop_timer ) {
-        if(true&&DEBUG) System.out.println("stopping countdown");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("stopping countdown",4));
         if(stop_timer)
             stopCountdownTimer();
         if( ! buttonErrorHidden ) {
@@ -227,7 +232,7 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void stopCountdownTimer() {
-        if(true&&DEBUG) System.out.println("stopping countdown timer");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("stopping countdown timer",4));
         if(reloadCountdown!=null) {
             reloadCountdown.cancel();
             reloadCountdown = null;
@@ -235,7 +240,7 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void hideButtonDueToError() {
-        if(true&&DEBUG) System.out.println("hiding button due to error");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("hiding button due to error",4));
         buttonErrorHidden=true;
         stopCountdownTimer();
         bReload.setText( R.string.button_reload_disabled );
@@ -243,7 +248,7 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void releaseButtonFromError() {
-        if(true&&DEBUG) System.out.println("releasing button from error");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("releasing button from error",4) );
         buttonErrorHidden=false;
         if(reloadCountdown==null) {
             bReload.setText( R.string.button_reload );

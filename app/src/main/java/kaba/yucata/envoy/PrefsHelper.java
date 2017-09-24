@@ -39,6 +39,26 @@ public class PrefsHelper {
     private static final int PREF_VALUE_S_PW_ACCEPTED = 24;
     private static final int PREF_VALUE_S_PW_REJECTED = 25;
 
+    public static String[] PREF_KEYS = {
+        PREF_KEY_USERNAME,
+        PREF_KEY_USER_ID,
+        PREF_KEY_SECRET,
+        PREF_KEY_INTERVAL_MIN,
+        PREF_KEY_GAMES_WAITING,
+        PREF_KEY_GAMES_TOTAL,
+        PREF_KEY_INVITES,
+        PREF_KEY_TOKEN_BASE64,
+        PREF_KEY_YUCATA_TOKEN,
+        PREF_KEY_SESSION_ID,
+        PREF_KEY_LAST_RESPONSE,
+        PREF_KEY_TIME_LAST_LOAD,
+        PREF_KEY_STATE_NETWORK_OK,
+        PREF_KEY_STATE_USERNAME,
+        PREF_KEY_STATE_PASSWORD
+    };
+
+    public static boolean DEBUG=true;
+
     public static void clearSessionPrefs(SharedPreferences sharedPrefs) {
         clearPrefs( sharedPrefs, PREF_KEY_SESSION_ID, PREF_KEY_YUCATA_TOKEN, PREF_KEY_TOKEN_BASE64 );
     }
@@ -178,7 +198,7 @@ public class PrefsHelper {
         }
         switch( sharedPrefs.getInt(PREF_KEY_STATE_PASSWORD,-1)) {
             case PREF_VALUE_S_PW_FAILED:
-            case PREF_VALUE_S_PW_ACCEPTED:
+            case PREF_VALUE_S_PW_REJECTED:
                 return false;
         }
         return true;
