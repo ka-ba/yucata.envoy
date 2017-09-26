@@ -30,6 +30,9 @@
     <string name="interval_set">Interval set to %1$s</string>
     <string name="hint_username">please configure a username</string>
     <string name="hint_password">please configure a password</string>
+    <string name="accepted">(accepted)</string>
+    <string name="rejected">(rejected)</string>
+    <string name="login_failed">(login failed)</string>
 
     <string name="polling_intervals_never">never</string>
     <string name="polling_intervals_15">15 minutes</string>
@@ -45,6 +48,7 @@
     <string name="s_login_failed">login failed</string>
     <string name="s_password_rejected">password rejected</string>
     <string name="s_network_failed">couldn\'t connect to server</string>
+    <string name="s_no_service">no background service possible</string>
 
     <string name="e_obtainingsession">error obtaining session</string>
     <string name="e_loadinginfo2">could not load game information (%1$s)</string>
@@ -54,6 +58,7 @@
     <!-- technical items: keys -->
     <string name="k_pref_username" translatable="false">username</string>
     <string name="k_pref_password" translatable="false">secret</string>
+    <string name="k_pref_have_service" translatable="false">have_data_service</string>
     <string name="k_pref_interval_min" translatable="false">interval_minutes</string>
     <string name="k_pref_notifications" translatable="false">fire_notifications</string>
 

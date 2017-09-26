@@ -1,35 +1,78 @@
 package kaba.yucata.envoy;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.EditTextPreference;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
+
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_HAVE_SERVICE;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_STATE_PASSWORD;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_STATE_USERNAME;
+import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_PW_ACCEPTED;
+import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_PW_FAILED;
+import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_PW_REJECTED;
+import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_UN_ACCEPTED;
+import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_UN_FAILED;
+import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_UN_REJECTED;
 
 /**
  * Created by kaba on 23/08/17.
  */
 
 public class SettingsFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
+    private EditTextPreference p_username;
+    private EditTextPreference p_password;
+    private ListPreference p_interval;
+    private CheckBoxPreference p_noti;
+    private SharedPreferences sharedPrefs;
+    private boolean have_serv;
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_gamecount);
-        final EditTextPreference p_username = (EditTextPreference) findPreference(getString(R.string.k_pref_username));
-        final EditTextPreference p_password = (EditTextPreference) findPreference(getString(R.string.k_pref_password));
-        final ListPreference p_interval = (ListPreference) findPreference(getString(R.string.k_pref_interval_min));
+        p_username = (EditTextPreference) findPreference(getString(R.string.k_pref_username));
+        p_password = (EditTextPreference) findPreference(getString(R.string.k_pref_password));
+        p_interval = (ListPreference) findPreference(getString(R.string.k_pref_interval_min));
+        p_noti = (CheckBoxPreference) findPreference(getString(R.string.k_pref_notifications));
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        have_serv = sharedPrefs.getBoolean(PREF_KEY_HAVE_SERVICE, true);
         // p_notification not needed here
         // pre-set summaries
         setSummary(p_username,p_username.getText());
         setSummary(p_password,p_password.getText());
-        setSummary(p_interval,p_interval.getValue());
-        setNotiActivityAfterInterval(p_interval.getValue());
+        if(have_serv) {
+            setSummary(p_interval, p_interval.getValue());
+            setNotiActivityAfterInterval(p_interval.getValue());
+        } else {
+            p_interval.setEnabled(false);
+            p_noti.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         // register listeners for updating summaries
         p_username.setOnPreferenceChangeListener(this);
         p_password.setOnPreferenceChangeListener(this);
-        p_interval.setOnPreferenceChangeListener(this);
+        if(have_serv)
+            p_interval.setOnPreferenceChangeListener(this);
     }
 
-//    private void setSummary(Preference pref) {
+    @Override
+    public void onStop() {
+        super.onStop();
+        p_username.setOnPreferenceChangeListener(null);
+        p_password.setOnPreferenceChangeListener(null);
+        if(have_serv)
+            p_interval.setOnPreferenceChangeListener(null);
+    }
+
+    //    private void setSummary(Preference pref) {
 //        if( pref instanceof EditTextPreference )
 //            setSummary( pref, ((EditTextPreference) pref).getText() );
 //        else if( pref instanceof ListPreference )
@@ -45,12 +88,34 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         if(pref.getKey().equals( getString(R.string.k_pref_username) )) {
             final String sval = (String) val;
             summary = ( (sval==null)||(sval.length()<1)
-                    ? getText(R.string.username_init_txt).toString() : sval );
+                    ? getString(R.string.username_init_txt) : sval );
+            switch( sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,-1)) {
+                case PREF_VALUE_S_UN_ACCEPTED:
+                    summary = summary+" " + getString(R.string.accepted);
+                    break;
+                case PREF_VALUE_S_UN_REJECTED:
+                    summary = summary+" " + getString(R.string.rejected);
+                    break;
+                case PREF_VALUE_S_UN_FAILED:
+                    summary = summary+" " + getString(R.string.login_failed);
+                    break;
+            }
         // password / secret
         } else if(pref.getKey().equals( getString(R.string.k_pref_password) )) {
             final String sval = (String) val;
             summary = ( (sval==null)||(sval.length()<1)
                     ? getString(R.string.password_nopw) : getString(R.string.password_set) );
+            switch( sharedPrefs.getInt(PREF_KEY_STATE_PASSWORD,-1)) {
+                case PREF_VALUE_S_PW_ACCEPTED:
+                    summary = summary+" " + getString(R.string.accepted);
+                    break;
+                case PREF_VALUE_S_PW_REJECTED:
+                    summary = summary+" " + getString(R.string.rejected);
+                    break;
+                case PREF_VALUE_S_PW_FAILED:
+                    summary = summary+" " + getString(R.string.login_failed);
+                    break;
+            }
         // polling interval
         } else if(pref.getKey().equals( getString(R.string.k_pref_interval_min) )) {
             try {

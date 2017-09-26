@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import kaba.yucata.envoy.datalink.LoaderTask;
@@ -19,6 +20,7 @@ import kaba.yucata.envoy.util.DebugHelper;
 import kaba.yucata.envoy.util.DiagnosticActivity;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
+import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_HAVE_SERVICE;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INTERVAL_MIN;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TIME_LAST_LOAD;
 
@@ -34,7 +36,8 @@ public class GameCountActivity extends AppCompatActivity
     private STATES state;
     private boolean buttonErrorHidden=false;
     private DataService dataService=null;
-    private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites, tvState;
+    private LinearLayout llContent;
+    private TextView tvUsername, tvGamesWaiting, tvGamesTotal, tvInvites, tvState, tvError;
     private Button bReload;
     private SharedPreferences sharedPrefs;
 
@@ -44,27 +47,45 @@ public class GameCountActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_count);
         state=STATE_OK;
-        tvUsername = (TextView) findViewById(R.id.tv_username);
-        tvGamesWaiting = (TextView) findViewById(R.id.tv_num_games_waiting);
-        tvGamesTotal = (TextView) findViewById(R.id.tv_num_games_total);
-        tvInvites = (TextView) findViewById(R.id.tv_num_pers_invites);
-        bReload = (Button) findViewById(R.id.b_reload);
-        tvState = (TextView) findViewById(R.id.tv_state);
-        bReload.setOnClickListener(this);
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        // initialize display fields
-        refreshDisplayedValues();
-        if( PrefsHelper.canReload(sharedPrefs) )
-            releaseButtonFromError();
-        else
-            hideButtonDueToError();
-        // listen for changes
-        sharedPrefs.registerOnSharedPreferenceChangeListener(this);
-        dataService = DataService.getService(this, 999999);  // FIXME: eliminate interval from constructor?
-        setDataServiceInterval();
+        tvError = (TextView) findViewById(R.id.tv_error);
+        try {
+            llContent = (LinearLayout) findViewById(R.id.ll_content);
+            tvUsername = (TextView) findViewById(R.id.tv_username);
+            tvGamesWaiting = (TextView) findViewById(R.id.tv_num_games_waiting);
+            tvGamesTotal = (TextView) findViewById(R.id.tv_num_games_total);
+            tvInvites = (TextView) findViewById(R.id.tv_num_pers_invites);
+            bReload = (Button) findViewById(R.id.b_reload);
+            tvState = (TextView) findViewById(R.id.tv_state);
+            bReload.setOnClickListener(this);
+            sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            // initialize display fields
+            refreshDisplayedValues();
+            if (PrefsHelper.canReload(sharedPrefs))
+                releaseButtonFromError();
+            else
+                hideButtonDueToError();
+            // listen for changes
+            sharedPrefs.registerOnSharedPreferenceChangeListener(this);
+            try {
+                dataService = DataService.getService(this, 999999);  // FIXME: eliminate interval from constructor?
+                if (true && DEBUG) System.out.println("service key: " + PREF_KEY_HAVE_SERVICE);
+                sharedPrefs.edit().putBoolean(PREF_KEY_HAVE_SERVICE, true).apply();
+            } catch (Exception e) {
+                dataService = null;
+                sharedPrefs.edit().putBoolean(PREF_KEY_HAVE_SERVICE, false).apply();
+            }
+            setDataServiceInterval();
+        } catch(Throwable t) {
+            llContent.setVisibility(View.INVISIBLE);
+            if(true&&DEBUG) System.out.println(DebugHelper.allToString(t));
+            tvError.setText( DebugHelper.allToString(t) );
+            tvError.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setDataServiceInterval() {
+        if(dataService==null)
+            return;
         final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
         if( interval != 999999 ) {  // 999999 means: no service
             dataService.setParamenters(interval);
@@ -72,6 +93,8 @@ public class GameCountActivity extends AppCompatActivity
         } else
             dataService.ensureStopped();
     }
+
+    public boolean hasDataService() { return dataService!=null; }
 
     @Override
     protected void onDestroy() {
@@ -86,7 +109,13 @@ public class GameCountActivity extends AppCompatActivity
     protected void onStart() {
         // app already runs, but moves from background to foreground - maybe update info
         super.onStart();
-        hideButtonByCountdown();  // also tests if necessary
+        try {
+            hideButtonByCountdown();  // also tests if necessary
+        } catch(Throwable t) {
+            llContent.setVisibility(View.INVISIBLE);
+            tvError.setText( DebugHelper.allToString(t) );
+            tvError.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -177,7 +206,7 @@ public class GameCountActivity extends AppCompatActivity
     public void onClick(View view) {
         if(view.getId()==R.id.b_reload) {
             final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
-            if( interval != 999999 )  // 999999 means: no service
+            if( (interval != 999999) && (dataService!=null) )  // 999999 means: no service
                 dataService.resetTimer();
             loadInfo();
         }

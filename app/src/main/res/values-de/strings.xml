@@ -45,4 +45,8 @@
     <string name="button_reload">Reload</string>
     <string name="mitem_diagnostic">Diagnose</string>
     <string name="title_activity_diagnostic">Diagnose</string>
+    <string name="s_no_service">kein Hintergrund-Service möglich</string>
+    <string name="accepted">(akzeptiert)</string>
+    <string name="login_failed">( Login-Fehler)</string>
+    <string name="rejected">(abgewiesen)</string>
 </resources>

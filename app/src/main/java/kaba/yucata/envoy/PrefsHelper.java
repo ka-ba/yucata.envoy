@@ -15,6 +15,7 @@ public class PrefsHelper {
     public static final String PREF_KEY_USER_ID = "userid";
     public static final String PREF_KEY_SECRET = "secret";
     public static final String PREF_KEY_INTERVAL_MIN = "interval_minutes";
+    public static final String PREF_KEY_HAVE_SERVICE = "have_data_service";
     public static final String PREF_KEY_GAMES_WAITING = "games_waiting";
     public static final String PREF_KEY_GAMES_TOTAL = "games_total";
     public static final String PREF_KEY_INVITES = "pers_invites";
@@ -24,26 +25,28 @@ public class PrefsHelper {
     public static final String PREF_KEY_SESSION_ID = "session";
     public static final String PREF_KEY_LAST_RESPONSE = "last_response_code";
     public static final String PREF_KEY_TIME_LAST_LOAD = "last_load_time_stamp";
+    public static final String PREF_KEY_LAST_SERVICE_ERROR = "last_service_error";
     private static final String PREF_KEY_STATE_NETWORK_OK = "state_network_ok";
 
     public static final String PREF_KEY_STATE_USERNAME = "state_username";
-    private static final int PREF_VALUE_S_UN_UNKNOWN  = 11;
-    private static final int PREF_VALUE_S_UN_CHANGED  = 12;
-    private static final int PREF_VALUE_S_UN_FAILED   = 13;
-    private static final int PREF_VALUE_S_UN_ACCEPTED = 14;
-    private static final int PREF_VALUE_S_UN_REJECTED = 15;
+    public static final int PREF_VALUE_S_UN_UNKNOWN  = 11;
+    public static final int PREF_VALUE_S_UN_CHANGED  = 12;
+    public static final int PREF_VALUE_S_UN_FAILED   = 13;
+    public static final int PREF_VALUE_S_UN_ACCEPTED = 14;
+    public static final int PREF_VALUE_S_UN_REJECTED = 15;
     public static final String PREF_KEY_STATE_PASSWORD = "state_password";
-    private static final int PREF_VALUE_S_PW_UNKNOWN  = 21;
-    private static final int PREF_VALUE_S_PW_CHANGED  = 22;
-    private static final int PREF_VALUE_S_PW_FAILED   = 23;
-    private static final int PREF_VALUE_S_PW_ACCEPTED = 24;
-    private static final int PREF_VALUE_S_PW_REJECTED = 25;
+    public static final int PREF_VALUE_S_PW_UNKNOWN  = 21;
+    public static final int PREF_VALUE_S_PW_CHANGED  = 22;
+    public static final int PREF_VALUE_S_PW_FAILED   = 23;
+    public static final int PREF_VALUE_S_PW_ACCEPTED = 24;
+    public static final int PREF_VALUE_S_PW_REJECTED = 25;
 
     public static String[] PREF_KEYS = {
         PREF_KEY_USERNAME,
         PREF_KEY_USER_ID,
         PREF_KEY_SECRET,
         PREF_KEY_INTERVAL_MIN,
+        PREF_KEY_HAVE_SERVICE,
         PREF_KEY_GAMES_WAITING,
         PREF_KEY_GAMES_TOTAL,
         PREF_KEY_INVITES,
@@ -54,7 +57,8 @@ public class PrefsHelper {
         PREF_KEY_TIME_LAST_LOAD,
         PREF_KEY_STATE_NETWORK_OK,
         PREF_KEY_STATE_USERNAME,
-        PREF_KEY_STATE_PASSWORD
+        PREF_KEY_STATE_PASSWORD,
+        PREF_KEY_LAST_SERVICE_ERROR
     };
 
     public static boolean DEBUG=true;
@@ -166,6 +170,8 @@ public class PrefsHelper {
             return context.getString(R.string.s_password_rejected);
         if( !(sharedPrefs.getBoolean(PREF_KEY_STATE_NETWORK_OK,true)) )
             return context.getString(R.string.s_network_failed);
+        if( !(sharedPrefs.getBoolean(PREF_KEY_HAVE_SERVICE,true)) )
+            return context.getString(R.string.s_no_service);
         return null;
     }
 

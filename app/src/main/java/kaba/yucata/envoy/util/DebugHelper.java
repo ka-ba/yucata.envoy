@@ -1,8 +1,10 @@
 package kaba.yucata.envoy.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 
 /**
@@ -33,5 +35,14 @@ public class DebugHelper {
         for( int i=1; (i<trace.length)&&(i<trace_lines+1); i++ ) // first line would be here => hide
             builder.append(" > ").append(trace[i].toString()).append('\n');
         return builder.toString();
+    }
+
+    public static String allToString(Throwable t) {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final PrintStream stream = new PrintStream(baos);
+//        stream.print( t.toString() );
+        t.printStackTrace( stream );
+        stream.flush();
+        return new String( baos.toByteArray() );
     }
 }

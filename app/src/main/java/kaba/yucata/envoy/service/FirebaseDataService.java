@@ -9,21 +9,22 @@ import android.content.Context;
 class FirebaseDataService extends DataService {
     public FirebaseDataService(Context context, int interval) {
         super(context,interval);
-        System.out.println("+FDS: constuctor");
+        System.out.println("+FDS: constuctor - Exception");
+        throw new RuntimeException("not implemented");
     }
 
     @Override
     public boolean resetTimer() {
-        throw new RuntimeException("no implemented");
+        throw new RuntimeException("not implemented");
     }
 
     @Override
     public boolean ensureRunning() {
-        throw new RuntimeException("no implemented");
+        throw new RuntimeException("not implemented");
     }
 
     @Override
     public boolean ensureStopped() {
-        throw new RuntimeException("no implemented");
+        throw new RuntimeException("not implemented");
     }
 }
