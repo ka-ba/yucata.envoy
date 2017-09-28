@@ -14,12 +14,12 @@ import kaba.yucata.envoy.GameCountActivity;
 import kaba.yucata.envoy.PrefsHelper;
 import kaba.yucata.envoy.R;
 
-import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
-import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_TOTAL;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_WAITING;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INVITES;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TIME_LAST_LOAD;
+//import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_ERROR;
+//import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
+//import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_TOTAL;
+//import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_GAMES_WAITING;
+//import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INVITES;
+//import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TIME_LAST_LOAD;
 
 /**
  * Created by kaba on 13/09/17.
@@ -48,12 +48,18 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
     @Override
     protected void onPostExecute(StateInfo info) {
         if( ! info.wasErronous() ) {
-            sharedPrefs.edit()
-                    .putInt(PREF_KEY_GAMES_WAITING, info.getGamesWaiting())
-                    .putInt(PREF_KEY_GAMES_TOTAL, info.getGamesTotal())
-                    .putInt(PREF_KEY_INVITES, info.getPersonalInvites())
-                    .putLong(PREF_KEY_TIME_LAST_LOAD,System.currentTimeMillis())
-                    .apply();
+            final SharedPreferences.Editor editor = PrefsHelper.begin(sharedPrefs);
+            PrefsHelper.setGamesWaiting( null, editor, info.getGamesWaiting() );
+            PrefsHelper.setGamesTotal( null, editor, info.getGamesTotal() );
+            PrefsHelper.setPersInvites( null, editor, info.getPersonalInvites() );
+            PrefsHelper.setTimeLastLoad( null, editor,System.currentTimeMillis() );
+            PrefsHelper.commit(editor);
+//            sharedPrefs.edit()
+//                    .putInt(PREF_KEY_GAMES_WAITING, info.getGamesWaiting())
+//                    .putInt(PREF_KEY_GAMES_TOTAL, info.getGamesTotal())
+//                    .putInt(PREF_KEY_INVITES, info.getPersonalInvites())
+//                    .putLong(PREF_KEY_TIME_LAST_LOAD,System.currentTimeMillis())
+//                    .apply();
         } else {  // was erronous
             PrefsHelper.interpretLoadError(sharedPrefs,info.getThrowable());
         }
@@ -91,7 +97,8 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
             super.onPostExecute(info);  // stores values to prefs
             if( sharedPrefs.getBoolean(context.getText( R.string.k_pref_notifications ).toString(),true)) {
                 if (!info.wasErronous())  // FIXME: show different notification on error
-                    popupNotification(sharedPrefs.getInt(PREF_KEY_GAMES_WAITING, 0), sharedPrefs.getInt(PREF_KEY_GAMES_TOTAL, 0));
+                    popupNotification( PrefsHelper.getGamesWaiting(sharedPrefs,0), PrefsHelper.getGamesTotal(sharedPrefs,0) );
+//                    popupNotification(sharedPrefs.getInt(PREF_KEY_GAMES_WAITING, 0), sharedPrefs.getInt(PREF_KEY_GAMES_TOTAL, 0));
             } else
                 notificationMgr.cancel(NOTIFICATION_ID);
         }

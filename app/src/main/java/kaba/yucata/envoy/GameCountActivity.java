@@ -20,9 +20,6 @@ import kaba.yucata.envoy.util.DebugHelper;
 import kaba.yucata.envoy.util.DiagnosticActivity;
 
 import static kaba.yucata.envoy.GameCountActivity.STATES.STATE_OK;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_HAVE_SERVICE;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_INTERVAL_MIN;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TIME_LAST_LOAD;
 
 public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
@@ -68,11 +65,10 @@ public class GameCountActivity extends AppCompatActivity
             sharedPrefs.registerOnSharedPreferenceChangeListener(this);
             try {
                 dataService = DataService.getService(this, 999999);  // FIXME: eliminate interval from constructor?
-                if (true && DEBUG) System.out.println("service key: " + PREF_KEY_HAVE_SERVICE);
-                sharedPrefs.edit().putBoolean(PREF_KEY_HAVE_SERVICE, true).apply();
+                PrefsHelper.setService(sharedPrefs,null,true);
             } catch (Exception e) {
                 dataService = null;
-                sharedPrefs.edit().putBoolean(PREF_KEY_HAVE_SERVICE, false).apply();
+                PrefsHelper.setService(sharedPrefs,null,false);
             }
             setDataServiceInterval();
         } catch(Throwable t) {
@@ -86,7 +82,7 @@ public class GameCountActivity extends AppCompatActivity
     private void setDataServiceInterval() {
         if(dataService==null)
             return;
-        final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
+        final int interval = PrefsHelper.getIntervalMin(sharedPrefs, 60, this);
         if( interval != 999999 ) {  // 999999 means: no service
             dataService.setParamenters(interval);
             dataService.ensureRunning();
@@ -155,14 +151,14 @@ public class GameCountActivity extends AppCompatActivity
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if( PrefsHelper.PREF_KEY_GAMES_WAITING.equals(key))
-            showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPreferences);
+            showIntInTV( tvGamesWaiting, PrefsHelper.getGamesWaiting(sharedPreferences,-1) );
         else if( PrefsHelper.PREF_KEY_GAMES_TOTAL.equals(key))
-            showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPreferences);
+            showIntInTV( tvGamesTotal, PrefsHelper.getGamesTotal(sharedPreferences,-1) );
         else if( PrefsHelper.PREF_KEY_INVITES.equals(key))
-            showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPreferences);
+            showIntInTV( tvInvites, PrefsHelper.getPersInvites(sharedPreferences,-1) );
 
         else if( PrefsHelper.PREF_KEY_USERNAME.equals(key)) {
-            tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
+            tvUsername.setText( PrefsHelper.getUsername(sharedPrefs,getString(R.string.username_init_txt)) );
             PrefsHelper.prefChangeUsername(sharedPreferences);
         } else if( PrefsHelper.PREF_KEY_SECRET.equals(key)) {
             PrefsHelper.prefChangePassword(sharedPreferences);
@@ -182,30 +178,38 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void refreshDisplayedValues() {
-        tvUsername.setText(sharedPrefs.getString(PrefsHelper.PREF_KEY_USERNAME, String.valueOf(R.string.username_init_txt)) );
-        showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPrefs);
-        showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPrefs);
-        showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPrefs);
+        tvUsername.setText( PrefsHelper.getUsername(sharedPrefs,getString(R.string.username_init_txt)) );
+//        showIntPrefInTV(tvGamesWaiting, PrefsHelper.PREF_KEY_GAMES_WAITING,sharedPrefs);
+//        showIntPrefInTV(tvGamesTotal, PrefsHelper.PREF_KEY_GAMES_TOTAL,sharedPrefs);
+//        showIntPrefInTV(tvInvites, PrefsHelper.PREF_KEY_INVITES,sharedPrefs);
+        showIntInTV( tvGamesWaiting, PrefsHelper.getGamesWaiting(sharedPrefs,-1) );
+        showIntInTV( tvGamesTotal, PrefsHelper.getGamesTotal(sharedPrefs,-1) );
+        showIntInTV( tvInvites, PrefsHelper.getPersInvites(sharedPrefs,-1) );
         updateStateTV();
     }
 
     private void showIntPrefInTV(TextView tv, String pref_key, SharedPreferences sharedPrefs) {
-        int pref_value=9999;
-        switch(state) {
-            case STATE_OK:
-                pref_value = sharedPrefs.getInt(pref_key, -1);
-                break;
-            case STATE_ERROR:
-                pref_value = -1;  // yields X
-                break;
-        }
-        tv.setText((pref_value>-1?String.valueOf(pref_value):"X"));
+        showIntInTV( tv, sharedPrefs.getInt(pref_key,-1) );
+//        int pref_value=9999;
+//        switch(state) {
+//            case STATE_OK:
+//                pref_value = sharedPrefs.getInt(pref_key, -1);
+//                break;
+//            case STATE_ERROR:
+//                pref_value = -1;  // yields X
+//                break;
+//        }
+//        tv.setText((pref_value>-1?String.valueOf(pref_value):"X"));
+    }
+
+    private void showIntInTV(TextView tv, int i) {
+        tv.setText( ( (state==STATE_OK)&&(i>-1) ? String.valueOf(i) : "X" ) );
     }
 
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.b_reload) {
-            final int interval = PrefsHelper.stringPrefToInt(sharedPrefs, PREF_KEY_INTERVAL_MIN, 60, this);
+            final int interval = PrefsHelper.getIntervalMin(sharedPrefs, 60, this);
             if( (interval != 999999) && (dataService!=null) )  // 999999 means: no service
                 dataService.resetTimer();
             loadInfo();
@@ -227,7 +231,7 @@ public class GameCountActivity extends AppCompatActivity
 
     private void hideButtonByCountdown() {
         if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("hiding button by countdown",4));
-        final long tload = sharedPrefs.getLong(PREF_KEY_TIME_LAST_LOAD, 1L);
+        final long tload = PrefsHelper.getTimeLastLoad(sharedPrefs, 1L);
         final long t_to_wait = tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
         if( t_to_wait >= 2000 ) {
             bReload.setEnabled(false);

@@ -19,11 +19,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import kaba.yucata.envoy.ConfigurationException;
+import kaba.yucata.envoy.PrefsHelper;
 
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_LAST_RESPONSE;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_SECRET;
 import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_TOKEN_BASE64;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_USERNAME;
 import static kaba.yucata.envoy.LocalConsts.BASEURL;
 
 /**
@@ -169,10 +168,10 @@ class DummyServerAbstraction extends ServerAbstraction {
             token = ( token_base64!=null ? Base64.decode(token_base64,0) : new byte[0] );
             if( need_token && (token.length<1) )
                 throw new IllegalStateException("mandatory token missing");
-            username = sharedPrefs.getString(PREF_KEY_USERNAME, null);
+            username = PrefsHelper.getUsername(sharedPrefs,null);
             if((username==null)||(username.length()<1))
                 throw new ConfigurationException("please configure a username");
-            secret = sharedPrefs.getString(PREF_KEY_SECRET, null);
+            secret = PrefsHelper.getPassword(sharedPrefs,null);
             if((secret==null)||(secret.length()<1))
                 throw new ConfigurationException("please configure a secret");
         }

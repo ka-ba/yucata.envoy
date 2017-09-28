@@ -48,10 +48,10 @@
     <string name="s_login_failed">login failed</string>
     <string name="s_password_rejected">password rejected</string>
     <string name="s_network_failed">couldn\'t connect to server</string>
-    <string name="s_no_service">no background service possible</string>
+    <string name="s_no_service">no background service</string>
 
     <string name="e_obtainingsession">error obtaining session</string>
-    <string name="e_loadinginfo2">could not load game information (%1$s)</string>
+    <string name="e_loadinginfo2">could not load game information (%1$d)</string>
     <string name="e_loadinginfo">could not load games info</string>
     <string name="e_parsingjson">could not parse json result</string>
 

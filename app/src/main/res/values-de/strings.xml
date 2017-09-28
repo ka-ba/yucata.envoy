@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Yucata Bote</string>
     <string name="e_loadinginfo">Fehler beim Lesen der Spielinformation</string>
-    <string name="e_loadinginfo2">Fehler beim Lesen der Spielinformation (%1$s)</string>
+    <string name="e_loadinginfo2">Fehler beim Lesen der Spielinformation (%1$d)</string>
     <string name="e_obtainingsession">Fehler beim Anmelden</string>
     <string name="e_parsingjson">Fehler \'could not parse json result\'</string>
     <string name="hint_username">Bitte gib einen Spielernamen an</string>
@@ -45,7 +45,7 @@
     <string name="button_reload">Reload</string>
     <string name="mitem_diagnostic">Diagnose</string>
     <string name="title_activity_diagnostic">Diagnose</string>
-    <string name="s_no_service">kein Hintergrund-Service möglich</string>
+    <string name="s_no_service">kein Hintergrund-Service</string>
     <string name="accepted">(akzeptiert)</string>
     <string name="login_failed">( Login-Fehler)</string>
     <string name="rejected">(abgewiesen)</string>

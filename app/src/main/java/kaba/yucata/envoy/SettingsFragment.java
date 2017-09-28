@@ -9,9 +9,6 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
 
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_HAVE_SERVICE;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_STATE_PASSWORD;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_STATE_USERNAME;
 import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_PW_ACCEPTED;
 import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_PW_FAILED;
 import static kaba.yucata.envoy.PrefsHelper.PREF_VALUE_S_PW_REJECTED;
@@ -39,7 +36,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         p_interval = (ListPreference) findPreference(getString(R.string.k_pref_interval_min));
         p_noti = (CheckBoxPreference) findPreference(getString(R.string.k_pref_notifications));
         sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        have_serv = sharedPrefs.getBoolean(PREF_KEY_HAVE_SERVICE, true);
+        have_serv = PrefsHelper.haveService(sharedPrefs,true);
         // p_notification not needed here
         // pre-set summaries
         setSummary(p_username,p_username.getText());
@@ -89,7 +86,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             final String sval = (String) val;
             summary = ( (sval==null)||(sval.length()<1)
                     ? getString(R.string.username_init_txt) : sval );
-            switch( sharedPrefs.getInt(PREF_KEY_STATE_USERNAME,-1)) {
+            switch( PrefsHelper.getStateUsername(sharedPrefs,-1) ) {
                 case PREF_VALUE_S_UN_ACCEPTED:
                     summary = summary+" " + getString(R.string.accepted);
                     break;
@@ -105,7 +102,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
             final String sval = (String) val;
             summary = ( (sval==null)||(sval.length()<1)
                     ? getString(R.string.password_nopw) : getString(R.string.password_set) );
-            switch( sharedPrefs.getInt(PREF_KEY_STATE_PASSWORD,-1)) {
+            switch( PrefsHelper.getStatePassword(sharedPrefs,-1) ) {
                 case PREF_VALUE_S_PW_ACCEPTED:
                     summary = summary+" " + getString(R.string.accepted);
                     break;

@@ -41,7 +41,7 @@ public class LolliJobService extends JobService {
                 new LoaderTask.LTService(this, sharedPrefs).execute(this);
             sharedPrefs.edit().remove(PrefsHelper.PREF_KEY_LAST_SERVICE_ERROR).apply();
         } catch(Throwable t) {
-            PrefsHelper.setStrings( sharedPrefs, PrefsHelper.PREF_KEY_LAST_SERVICE_ERROR, DebugHelper.allToString(t) );
+            PrefsHelper.setServiceError(sharedPrefs, null, DebugHelper.allToString(t));
         }
         return false;
     }

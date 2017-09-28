@@ -26,12 +26,6 @@ import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.PrefsHelper;
 import kaba.yucata.envoy.R;
 
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_SECRET;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_SESSION_ID;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_USERNAME;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_USER_ID;
-import static kaba.yucata.envoy.PrefsHelper.PREF_KEY_YUCATA_TOKEN;
-
 /**
  * Created by kaba on 07/09/17.
  */
@@ -79,10 +73,10 @@ public class YucataServerAbstraction extends ServerAbstraction {
 
     @Override @NonNull
     public SessionAbstraction requestSession() throws ConfigurationException, CommunicationException {
-        final String username = sharedPrefs.getString(PREF_KEY_USERNAME, null);
+        final String username = PrefsHelper.getUsername(sharedPrefs,null);
         if( (username==null) || (username.isEmpty()) )
             throw new ConfigurationException(context.getString(R.string.hint_username));
-        final String password = sharedPrefs.getString(PREF_KEY_SECRET, null);
+        final String password = PrefsHelper.getPassword(sharedPrefs,null);
         if( (password==null) || (password.isEmpty()) )
             throw new ConfigurationException(context.getString(R.string.hint_password));
         PrefsHelper.clearSessionPrefs(sharedPrefs);
@@ -123,7 +117,11 @@ public class YucataServerAbstraction extends ServerAbstraction {
             }
             if( (session_id==null) || (token==null) )
                 throw new CommunicationException.LoginFailedException("login failed ("+connection.getResponseCode()+")");  // FIXME: subclass CommunicationExc.?
-            PrefsHelper.setStrings( sharedPrefs, PREF_KEY_SESSION_ID, session_id, PREF_KEY_YUCATA_TOKEN, token );
+//            PrefsHelper.setStrings( sharedPrefs, PREF_KEY_SESSION_ID, session_id, PREF_KEY_YUCATA_TOKEN, token );
+            final SharedPreferences.Editor editor = PrefsHelper.begin(sharedPrefs);
+            PrefsHelper.setSessionId(null,editor,session_id);
+            PrefsHelper.setYucataToken(null,editor,token);
+            PrefsHelper.commit(editor);
             if(true&&DEBUG) {
                 System.out.println("received session tokens:\n session: "+session_id+"\n yucata: "+token);
             }
@@ -242,13 +240,13 @@ public class YucataServerAbstraction extends ServerAbstraction {
         private int userId=-1;
         YucataSession()
                 throws CommunicationException.NoSessionException {
-            sessionId = sharedPrefs.getString(PREF_KEY_SESSION_ID, null);
+            sessionId = PrefsHelper.getSessionId(sharedPrefs, null);
             if( (sessionId==null) || (sessionId.isEmpty()) )
                 throw new CommunicationException.NoSessionException("no current session");
-            yucataToken = sharedPrefs.getString(PREF_KEY_YUCATA_TOKEN, null);
+            yucataToken = PrefsHelper.getYucataToken(sharedPrefs, null);
             if( (yucataToken==null) || (yucataToken.isEmpty()) )
                 throw new CommunicationException.NoSessionException("no current authentication token");
-            userId = sharedPrefs.getInt(PREF_KEY_USER_ID,-1);
+            userId = PrefsHelper.getUserId(sharedPrefs,-1);
             if(true&&DEBUG) {
                 System.out.println("new session object:\n session: "+sessionId+"\n yucata: "+yucataToken+"\n userid: "+userId);
             }
@@ -283,7 +281,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
                 if(game.getInt("ID") == onTurnGame) {
                     final int pid = game.getInt("PlayerOnTurn");  // must be this user
                     userId=pid;
-                    sharedPrefs.edit().putInt(PREF_KEY_USER_ID,pid).apply();
+                    PrefsHelper.setUserId(sharedPrefs,null,pid);
                     return;
                 }
             }
