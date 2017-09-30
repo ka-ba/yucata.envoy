@@ -61,7 +61,7 @@ public class PrefsHelper {
         PREF_KEY_LAST_SERVICE_ERROR
     };
 
-    public static boolean DEBUG=true;
+    public static boolean DEBUG=BuildConfig.DEBUG;
 
     public static void clearSessionPrefs(SharedPreferences sharedPrefs) {
         clearPrefs( sharedPrefs, PREF_KEY_SESSION_ID, PREF_KEY_YUCATA_TOKEN, PREF_KEY_TOKEN_BASE64 );

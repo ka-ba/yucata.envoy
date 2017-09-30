@@ -25,7 +25,7 @@ public class GameCountActivity extends AppCompatActivity
     implements SharedPreferences.OnSharedPreferenceChangeListener,
         View.OnClickListener
 {
-    public final boolean DEBUG=true;
+    public final boolean DEBUG=BuildConfig.DEBUG;
     private static final long RELOAD_WAIT_MILLIS = 120000;  // TODO: 300000 = 5 min better / necessary?
     private CountDownTimer reloadCountdown=null;
 
@@ -239,7 +239,7 @@ public class GameCountActivity extends AppCompatActivity
                 @Override
                 public void onTick(long tleft) {
                     final long mleft = tleft / 60000;
-                    final long sleft = (tleft-mleft) / 1000;
+                    final long sleft = (tleft-mleft*60000) / 1000;
                     bReload.setText( String.format("%d:%02d",mleft,sleft));
                 }
                 @Override

@@ -7,6 +7,7 @@ import android.support.v7.preference.PreferenceManager;
 
 import java.io.IOException;
 
+import kaba.yucata.envoy.BuildConfig;
 import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.PrefsHelper;
 
@@ -15,7 +16,7 @@ import kaba.yucata.envoy.PrefsHelper;
  */
 
 public abstract class ServerAbstraction {
-    private final static boolean DEBUG=true;
+    private final static boolean DEBUG= BuildConfig.DEBUG;
     public final Context context;
     public final SharedPreferences sharedPrefs;
     protected ServerAbstraction(Context context) {

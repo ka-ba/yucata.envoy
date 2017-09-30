@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import kaba.yucata.envoy.BuildConfig;
 import kaba.yucata.envoy.ConfigurationException;
 import kaba.yucata.envoy.PrefsHelper;
 import kaba.yucata.envoy.R;
@@ -35,8 +36,8 @@ public class YucataServerAbstraction extends ServerAbstraction {
 //        CookieHandler.setDefault(new CookieManager());
 //    }
 
-    private static final boolean DEBUG = true;
-    public final static String LOGIN_URL_S="http://www.yucata.de/en";
+    private static final boolean DEBUG = BuildConfig.DEBUG;
+    public final static String LOGIN_URL_S="http://www.yucata.de/en";  // TODO: sensibly use language code?
     public final static String GETGAMES_URL_S="http://www.yucata.de/Services/YucataService.svc/GetCurrentGames";
     public final static String GETGAMES_REFERER="http://www.yucata.de/en/CurrentGames";
     private static final String MP_BOUNDARY = "GREATWALLOFCHINA";
@@ -86,7 +87,7 @@ public class YucataServerAbstraction extends ServerAbstraction {
             connection = (HttpURLConnection) LOGIN_URL.openConnection();
             connection.setRequestProperty("Content-Type","multipart/form-data; boundary="+MP_BOUNDARY);
             connection.setRequestProperty("Referer",LOGIN_URL_S);
-            connection.setRequestProperty("User-Agent","YucataEnvoy");
+            connection.setRequestProperty("User-Agent","YucataEnvoy "+BuildConfig.VERSION_NAME);
             connection.setInstanceFollowRedirects(false);
             final String post = String.format(POST,username,password);  // FIXME: introduce MultipartHelper!?
             connection.setDoOutput(true);
@@ -170,9 +171,8 @@ public class YucataServerAbstraction extends ServerAbstraction {
             connection = (HttpURLConnection) GETGAMES_URL.openConnection();
             connection.setRequestProperty("Accept","application/json");
             connection.setRequestProperty("Referer",GETGAMES_REFERER);
-            connection.setRequestProperty("User-Agent","YucataEnvoy");
+            connection.setRequestProperty("User-Agent","YucataEnvoy "+BuildConfig.VERSION_NAME);
             connection.setRequestProperty("Cookie",y_session.getCookieHeaderValue());
-            // todo: set User-Agent (and test if overridden..)
             connection.setDoOutput(true);  // zero length post
             connection.setFixedLengthStreamingMode(0);
             // receive
