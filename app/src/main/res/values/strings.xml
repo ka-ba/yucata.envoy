@@ -67,4 +67,11 @@
 
     <string name="polling_intervals_minutes_never" translatable="false">999999</string>
     <string name="polling_intervals_minutes_15" translatable="false">15</string>
+    <string name="polling_intervals_minutes_30" translatable="false">30</string>
+    <string name="polling_intervals_minutes_45" translatable="false">45</string>
+    <string name="polling_intervals_minutes_60" translatable="false">60</string>
+    <string name="polling_intervals_minutes_120" translatable="false">120</string>
+    <string name="polling_intervals_minutes_480" translatable="false">480</string>
+    <string name="polling_intervals_minutes_720" translatable="false">720</string>
+    <string name="polling_intervals_minutes_1440" translatable="false">1440</string>
 </resources>
