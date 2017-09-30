@@ -31,11 +31,11 @@ public abstract class DataService {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             return new LolliDataService(context,interval);
         else {
-            try {
-                return new FirebaseDataService(context,interval);
-            } catch( Exception e ) {
+//            try {
+//                return new FirebaseDataService(context,interval);
+//            } catch( Exception e ) {
                 return new BasicDataService(context,interval);
-            }
+//            }
         }
     }
 }
