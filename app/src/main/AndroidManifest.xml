@@ -37,7 +37,8 @@
         <activity
             android:name=".util.DiagnosticActivity"
             android:label="@string/title_activity_diagnostic" />
-            <!--android:theme="@style/AppTheme.NoActionBar"-->
+        <!-- android:theme="@style/AppTheme.NoActionBar" -->
+        <activity android:name=".AboutActivity"></activity>
     </application>
 
 </manifest>

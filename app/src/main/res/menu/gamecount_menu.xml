@@ -6,9 +6,4 @@
         android:orderInCategory="100"
         android:title="@string/mitem_settings"
         app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/mitem_diagnostic"
-        android:orderInCategory="200"
-        android:title="@string/mitem_diagnostic"
-        app:showAsAction="never"/>
 </menu>

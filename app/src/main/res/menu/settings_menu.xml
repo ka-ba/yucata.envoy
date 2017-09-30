@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/mitem_about"
+        android:orderInCategory="100"
+        android:title="@string/mitem_about"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/mitem_diagnostic"
+        android:orderInCategory="200"
+        android:title="@string/mitem_diagnostic"
+        app:showAsAction="never"/>
+</menu>
