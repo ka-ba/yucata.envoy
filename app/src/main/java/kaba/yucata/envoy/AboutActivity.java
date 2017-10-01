@@ -16,6 +16,7 @@ public class AboutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_about);
         TextView tv = (TextView) findViewById(R.id.about_lic_tv);
         tv.setMovementMethod(LinkMovementMethod.getInstance());
-        tv.setText(Html.fromHtml(getString(R.string.about_lic_text)));
+        final String text = getString(R.string.about_lic_text,BuildConfig.VERSION_NAME);
+        tv.setText(Html.fromHtml(text));
     }
 }
