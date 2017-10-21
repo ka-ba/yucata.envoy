@@ -24,7 +24,8 @@ class BasicDataService extends DataService {
     }
 
     @Override
-    public boolean ensureStopped() {
-        throw new RuntimeException("not implemented");
-    }
+    public boolean isRunning() { throw new RuntimeException("not implemented"); }
+
+    @Override
+    public boolean ensureStopped() { throw new RuntimeException("not implemented"); }
 }

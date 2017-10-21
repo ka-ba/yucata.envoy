@@ -25,6 +25,7 @@ public abstract class DataService {
     public abstract boolean resetTimer();
     public abstract boolean ensureRunning();
     public abstract boolean ensureStopped();
+    public abstract boolean isRunning();
 
     public static DataService getService(Context context, int interval) {
         System.out.println("+DS: getService");

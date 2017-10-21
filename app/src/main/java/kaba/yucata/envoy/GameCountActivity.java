@@ -26,7 +26,6 @@ public class GameCountActivity extends AppCompatActivity
         View.OnClickListener
 {
     public final boolean DEBUG=BuildConfig.DEBUG;
-    private static final long RELOAD_WAIT_MILLIS = 120000;  // TODO: 300000 = 5 min better / necessary?
     private CountDownTimer reloadCountdown=null;
 
     public enum STATES { STATE_OK,STATE_ERROR};
@@ -107,6 +106,8 @@ public class GameCountActivity extends AppCompatActivity
         super.onStart();
         try {
             hideButtonByCountdown();  // also tests if necessary
+            if( (!hasDataService()) || (!dataService.isRunning()) )
+                loadInfo();
         } catch(Throwable t) {
             llContent.setVisibility(View.INVISIBLE);
             tvError.setText( DebugHelper.allToString(t) );
@@ -225,14 +226,17 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void loadInfo() {
+        if( PrefsHelper.isLoadBlocked(sharedPrefs) ) {
+            if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("loading blocked",4));
+            return;  // no op
+        }
         if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("loading info",4));
         new LoaderTask.LTActivity(this,sharedPrefs).execute(this);
     }
 
     private void hideButtonByCountdown() {
         if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("hiding button by countdown",4));
-        final long tload = PrefsHelper.getTimeLastLoad(sharedPrefs, 1L);
-        final long t_to_wait = tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
+        final long t_to_wait = PrefsHelper.loadBlockingLeftMillis(sharedPrefs);
         if( t_to_wait >= 2000 ) {
             bReload.setEnabled(false);
             reloadCountdown = new CountDownTimer(t_to_wait,1000) {
