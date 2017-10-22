@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="kaba.yucata.envoy.GameCountActivity">
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/horz_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_content_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:clickable="false"
+                android:contentDescription="@string/username_cont_desc"
+                android:gravity="bottom|center_horizontal"
+                android:lines="1"
+                android:maxLines="1"
+                android:text="@string/username_init_txt"
+                android:textAlignment="center"
+                android:textSize="24sp" /> <!-- tv_username -->
+
+            <ImageView
+                android:id="@+id/img_yucata_logo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:scaleType="fitCenter"
+                app:srcCompat="@mipmap/ic_launcher" /> <!-- img_yucata_logo -->
+
+            <Button
+                android:id="@+id/b_reload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="@string/button_reload"
+                android:textAlignment="center" /> <!-- b_reload -->
+
+        </LinearLayout> <!-- ll_content_left -->
+
+        <LinearLayout
+            android:id="@+id/ll_content_right"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- waiting -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:clickable="false"
+                    android:gravity="top|center_horizontal"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:text="@string/waiting_games"
+                    android:textAlignment="center"
+                    android:textSize="24sp" /> <!-- waiting_games -->
+
+                <TextView
+                    android:id="@+id/tv_num_games_waiting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:text="X"
+                    android:textAlignment="center"
+                    android:textSize="50sp" /> <!-- tv_num_games_waiting -->
+            </LinearLayout> <!-- games waiting -->
+
+            <!-- total -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:clickable="false"
+                    android:gravity="top|center_horizontal"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:text="@string/total_games"
+                    android:textAlignment="center"
+                    android:textSize="24sp" /> <!-- total_games -->
+
+                <TextView
+                    android:id="@+id/tv_num_games_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:text="X"
+                    android:textAlignment="center"
+                    android:textSize="50sp" /> <!-- tv_num_games_total -->
+
+            </LinearLayout> <!-- games total -->
+
+            <!-- invites -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tv_label_invites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:gravity="top|center_horizontal"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:text="@string/pers_invites"
+                    android:textAlignment="center"
+                    android:textSize="24sp" /> <!-- tv_label_invites -->
+
+                <TextView
+                    android:id="@+id/tv_num_pers_invites"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:gravity="center"
+                    android:text="X"
+                    android:textAlignment="center"
+                    android:textSize="50sp" /> <!-- tv_num_pers_invites -->
+
+            </LinearLayout> <!-- personal invitations -->
+
+        </LinearLayout> <!-- ll_content_right -->
+
+    </LinearLayout> <!-- horz_group -->
+
+
+        <TextView
+            android:id="@+id/tv_state"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:clickable="false"
+            android:gravity="top|center_horizontal"
+            android:lines="1"
+            android:maxLines="1"
+            android:text=""
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:visibility="invisible" /> <!-- tv_state -->
+
+    </LinearLayout> <!-- all normal content -->
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:visibility="gone"
+        android:text=""
+        android:textSize="18sp" /> <!-- tv_error -->
+
+</FrameLayout>
