@@ -49,9 +49,13 @@ public abstract class LoaderTask extends AsyncTask<Context,Void,StateInfo> {
     protected void onPostExecute(StateInfo info) {
         if( ! info.wasErronous() ) {
             final SharedPreferences.Editor editor = PrefsHelper.begin(sharedPrefs);
-            PrefsHelper.setGamesWaiting( null, editor, info.getGamesWaiting() );
-            PrefsHelper.setGamesTotal( null, editor, info.getGamesTotal() );
+            if(info.hasGamesInfo()) {
+                PrefsHelper.setGamesWaiting(null, editor, info.getGamesWaiting());
+                PrefsHelper.setGamesTotal(null, editor, info.getGamesTotal());
+            }
             PrefsHelper.setPersInvites( null, editor, info.getPersonalInvites() );
+            if(info.deductedPlayerId())
+                PrefsHelper.setUserId( null, editor, info.getMyPlayerId() );
             PrefsHelper.setTimeLastLoad( null, editor,System.currentTimeMillis() );
             PrefsHelper.commit(editor);
 //            sharedPrefs.edit()
