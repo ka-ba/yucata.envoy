@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import kaba.yucata.envoy.datalink.LoaderTask;
 import kaba.yucata.envoy.service.DataService;
@@ -49,7 +50,9 @@ public class GameCountActivity extends AppCompatActivity
             llContent = (LinearLayout) findViewById(R.id.ll_content);
             tvUsername = (TextView) findViewById(R.id.tv_username);
             tvGamesWaiting = (TextView) findViewById(R.id.tv_num_games_waiting);
+            tvGamesWaiting.setOnClickListener(this);
             tvGamesTotal = (TextView) findViewById(R.id.tv_num_games_total);
+            tvGamesTotal.setOnClickListener(this);
             tvInvites = (TextView) findViewById(R.id.tv_num_pers_invites);
             bReload = (Button) findViewById(R.id.b_reload);
             tvState = (TextView) findViewById(R.id.tv_state);
@@ -133,16 +136,23 @@ public class GameCountActivity extends AppCompatActivity
         return true;
     }
 
+    private void fireActivityIntent(Class<?> klasse) {
+        final Intent settings_intent = new Intent(this,klasse);
+        startActivity(settings_intent);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mitem_settings:
-                final Intent settings_intent = new Intent(this, SettingsActivity.class);
-                startActivity(settings_intent);
+                fireActivityIntent(SettingsActivity.class);
+//                final Intent settings_intent = new Intent(this, SettingsActivity.class);
+//                startActivity(settings_intent);
                 return true;
             case R.id.mitem_diagnostic:
-                final Intent diagnostic_intent = new Intent(this, DiagnosticActivity.class);
-                startActivity(diagnostic_intent);
+                fireActivityIntent(DiagnosticActivity.class);
+//                final Intent diagnostic_intent = new Intent(this, DiagnosticActivity.class);
+//                startActivity(diagnostic_intent);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -213,6 +223,12 @@ public class GameCountActivity extends AppCompatActivity
             if( (interval != 999999) && (dataService!=null) )  // 999999 means: no service
                 dataService.resetTimer();
             loadInfo();
+        } else if(view.getId()==R.id.tv_num_games_waiting) {
+//            Toast.makeText(this,"WAITING",Toast.LENGTH_LONG).show();
+            fireActivityIntent(GameListActivity.class);
+        } else if(view.getId()==R.id.tv_num_games_total) {
+//            Toast.makeText(this,"TOTAL",Toast.LENGTH_LONG).show();
+            fireActivityIntent(GameListActivity.class);
         }
         // FIXME: super...?
     }
