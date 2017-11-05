@@ -22,7 +22,11 @@ A Yucata account is a prerequisite to use this apps functionality.
 ## change history
 
 - 0.4
-..* initial beta release
+  * initial beta release
 - 0.4.1
-..* reload data on app-open when not using backgroud service
-..* insignificant bug fix
+  * reload data on app-open when not using backgroud service
+  * insignificant bug fix
+- 0.5.0
+  * display list of games (tap on count)
+  * landscape layout
+  
