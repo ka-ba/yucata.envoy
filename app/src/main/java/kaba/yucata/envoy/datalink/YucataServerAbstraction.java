@@ -180,7 +180,12 @@ public class YucataServerAbstraction extends ServerAbstraction {
             if( (responseCode<200) || (responseCode>299) )
                 throw new CommunicationException.IOException( context.getString(R.string.e_loadinginfo2,responseCode) );
             final String json_str = readStreamToString(connection.getInputStream());
-            return parseJSON(y_session,json_str);
+
+            final StateInfo info = new StateInfo();
+            info.addGamesInfo( json_str );
+            return info;
+
+//            return parseJSON(y_session,json_str);
         } catch (JSONException e) {
             throw new CommunicationException(context.getString(R.string.e_parsingjson),e);  // FIXME: specialized Exc.?
         } catch (IOException e) {
@@ -189,38 +194,6 @@ public class YucataServerAbstraction extends ServerAbstraction {
             if(connection!=null)
                 connection.disconnect();
         }
-    }
-
-    private StateInfo parseJSON(YucataSession y_session, String json_str) throws JSONException {
-        final JSONObject json = new JSONObject(json_str);
-        final JSONObject json_d = json.getJSONObject("d");
-        final int totalGames = json_d.getInt("TotalGames");
-        System.out.println("read "+totalGames+" total games from json");
-        int onTurnCount=0;
-        final int onTurnGame = json_d.getInt("NextGameOnTurn");  // easy if zero
-        if(onTurnGame!=0) {  // complicated
-            final JSONArray games = json_d.getJSONArray("Games");
-            if( y_session.isUserIdUnknown() )
-                y_session.parseJsonUserId(games,onTurnGame);
-            onTurnCount = parseJsonCountOnTurn(games,y_session.getUserId());
-        }
-        // FIXME: invitation count ?
-        if(true&&DEBUG)
-            System.out.println("received games info: "+totalGames+" total, "+onTurnCount+" on turn");
-        return new StateInfo(totalGames,onTurnCount,-1);
-    }
-
-    private int parseJsonCountOnTurn(JSONArray games, int userId)
-            throws JSONException {
-        int count=0;
-        for( int i=0; i<games.length(); i++ ) {
-            if( games.isNull(i))
-                continue;
-            final JSONObject game = games.getJSONObject(i);
-            if(game.getInt("PlayerOnTurn") == userId)
-                count++;
-        }
-        return count;
     }
 
     private String readStreamToString(InputStream stream) {
@@ -272,19 +245,19 @@ public class YucataServerAbstraction extends ServerAbstraction {
             return userId == -1;
         }
 
-        public void parseJsonUserId(JSONArray games, int onTurnGame)
-                throws JSONException {
-            for( int i=0; i<games.length(); i++ ) {
-                if( games.isNull(i))
-                    continue;
-                final JSONObject game = games.getJSONObject(i);
-                if(game.getInt("ID") == onTurnGame) {
-                    final int pid = game.getInt("PlayerOnTurn");  // must be this user
-                    userId=pid;
-                    PrefsHelper.setUserId(sharedPrefs,null,pid);
-                    return;
-                }
-            }
-        }
+//        public void parseJsonUserId(JSONArray games, int onTurnGame)
+//                throws JSONException {
+//            for( int i=0; i<games.length(); i++ ) {
+//                if( games.isNull(i))
+//                    continue;
+//                final JSONObject game = games.getJSONObject(i);
+//                if(game.getInt("ID") == onTurnGame) {
+//                    final int pid = game.getInt("PlayerOnTurn");  // must be this user
+//                    userId=pid;
+//                    PrefsHelper.setUserId(sharedPrefs,null,pid);
+//                    return;
+//                }
+//            }
+//        }
     }
 }
