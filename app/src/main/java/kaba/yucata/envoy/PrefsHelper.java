@@ -61,6 +61,7 @@ public class PrefsHelper {
         PREF_KEY_LAST_SERVICE_ERROR
     };
 
+    private static final long RELOAD_WAIT_MILLIS = 120000;  // TODO: 300000 = 5 min better / necessary?
     public static boolean DEBUG=BuildConfig.DEBUG;
 
     public static void clearSessionPrefs(SharedPreferences sharedPrefs) {
@@ -208,6 +209,15 @@ public class PrefsHelper {
                 return false;
         }
         return true;
+    }
+
+    public static boolean isLoadBlocked(SharedPreferences sharedPrefs) {
+        return ( loadBlockingLeftMillis(sharedPrefs) > 0 );
+    }
+
+    public static long loadBlockingLeftMillis(SharedPreferences sharedPrefs) {
+        final long tload = PrefsHelper.getTimeLastLoad(sharedPrefs, 1L);
+        return tload + RELOAD_WAIT_MILLIS - System.currentTimeMillis();
     }
 
     private static boolean isStringPrefNullEmpty(SharedPreferences sharedPrefs, String key) {

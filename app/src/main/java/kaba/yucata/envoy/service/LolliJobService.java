@@ -37,7 +37,7 @@ public class LolliJobService extends JobService {
                 System.out.println("+LDS: no shared prefs");
                 return false;
             }
-            if (PrefsHelper.canReload(sharedPrefs))
+            if( (PrefsHelper.canReload(sharedPrefs)) && (!PrefsHelper.isLoadBlocked(sharedPrefs)) )
                 new LoaderTask.LTService(this, sharedPrefs).execute(this);
             sharedPrefs.edit().remove(PrefsHelper.PREF_KEY_LAST_SERVICE_ERROR).apply();
         } catch(Throwable t) {

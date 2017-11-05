@@ -31,30 +31,40 @@ public class LolliDataService extends DataService {
     public boolean resetTimer() {
         System.out.println("will change scheduling interval to "+interval+" min");
         scheduler.cancel(JOB_ID);
-        return shedule();
+        return schedule();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean ensureRunning() {
         System.out.println("+LDS: ensure running");
+        final long running = getRunningInterval();
+        if(running<1)  // not running
+            return schedule();
+        if( running != interval*60000 ) {
+            System.out.println("will change scheduling interval from " + running / 60000 + " min to " + interval+ " min");
+            return resetTimer();
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return ( getRunningInterval() > 0 );
+    }
+
+    private long getRunningInterval() {
         final List<JobInfo> allPendingJobs = scheduler.getAllPendingJobs();
         if(allPendingJobs!=null) {
             for( JobInfo pending : allPendingJobs ) {
-                if(pending.getId()==JOB_ID) {
-                    if( pending.getIntervalMillis() != interval*60000 ) {
-                        System.out.println("will change scheduling interval from " + pending.getIntervalMillis() / 60000 + " min to " + interval+ " min");
-                        return resetTimer();
-                    }
-                    System.out.println("+LDS: job already runs with give interval of "+interval+" min");
-                    return true;
-                }
+                if(pending.getId()==JOB_ID)
+                    return pending.getIntervalMillis();
             }
         }
-        return shedule();
+        return 0;  // not running
     }
 
-    private boolean shedule() {
+    private boolean schedule() {
         JobInfo job = new JobInfo.Builder(
                 JOB_ID, new ComponentName(context, LolliJobService.class))
                 .setPeriodic(interval * 60000)

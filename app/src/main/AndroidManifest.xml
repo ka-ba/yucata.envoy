@@ -36,9 +36,20 @@
         </activity>
         <activity
             android:name=".util.DiagnosticActivity"
-            android:label="@string/title_activity_diagnostic" />
+            android:label="@string/title_activity_diagnostic"
+            android:parentActivityName=".SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SettingsActivity" />
+        </activity>
         <!-- android:theme="@style/AppTheme.NoActionBar" -->
-        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".SettingsActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SettingsActivity" />
+        </activity>
         <activity
             android:name=".GameListActivity"
             android:label="@string/title_activity_gamelist"
