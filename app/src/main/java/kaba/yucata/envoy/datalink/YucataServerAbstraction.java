@@ -37,9 +37,9 @@ public class YucataServerAbstraction extends ServerAbstraction {
 //    }
 
     private static final boolean DEBUG = BuildConfig.DEBUG;
-    public final static String LOGIN_URL_S="http://www.yucata.de/en";  // TODO: sensibly use language code?
-    public final static String GETGAMES_URL_S="http://www.yucata.de/Services/YucataService.svc/GetCurrentGames";
-    public final static String GETGAMES_REFERER="http://www.yucata.de/en/CurrentGames";
+    public final static String LOGIN_URL_S="https://www.yucata.de/en";  // TODO: sensibly use language code?
+    public final static String GETGAMES_URL_S="https://www.yucata.de/Services/YucataService.svc/GetCurrentGames";
+    public final static String GETGAMES_REFERER="https://www.yucata.de/en/CurrentGames";
     private static final String MP_BOUNDARY = "GREATWALLOFCHINA";
     private static final String POST = "--"+MP_BOUNDARY+
             "\r\nContent-Disposition: form-data; name=\"__VIEWSTATE\"\r\n\r\ny4x9hvWyAIuf96efDj1cRboeBRnRQ/8hVKSNfo6/4KOouVJSyokh4j3oZALdT3tg/2R9UJUKogZCyYwQutbmIWMLhv+Zl1HrYQ3EYiXKSFfiihZyfwiGLvV7PYsU8dNCu9B/3yOCvwAqStrwbzi/ixuFVZc3qfLP+ZWbkap/zh2y0e9hzn15BG/B2sdtpWD7XN97cFRmoTnGxJ4+p78yKnzncjw2NND7tstmTYpY5D9ayi5q8PtgaJtblkg6Q/quH2PfEZqFlyYl0RpZn17IPu23xoLsj2qT0aP4MSaEwep1dOnTOqFlppwqcFxafwRNhw5KSxpw+kcA5PMwkk6ZhnPFOJaDYZ/lbPWn4X+6a7wrukEzS9EBwqeHUKSLOZm0Emyg3zt/aP/QJR1n6MUPCggPWEhOgjHN2NptA6jzlWKs4VZxFito2eUayU6zCIjA24TkPoIeUdNUkF+ShNEpXLdATwKbrTKqW9qgl6GP3GoV4AmYpndlVNLZf+8iQPeKUjN7+1FwYODbXNalKsagNNTCb6LKt4036vml04PQ6sBkq1INAB8fwU7DNlNMxZuHDA4eElvS9rOgjmYbR4nVGYyHTBftS5s93b2ocFneoEDz6bK7N9dpmAHRb0GVhlIQx+OybKcYvLI5WNi9B8NVaOmiT19w49jo8QT+Zg+cqWuKVblCb2xYzYdA4V4gQoLdUHKYR3m26GtGNwkq0GD/nBzlcdaiZo5rJbX25x146GRuOPba0BvXipy2P1Rtk8c2qOkQzpPuitu32oqdHewRG9rYwGg7/EorfbARovpMboN0K0JBLmTTF9vWEzx4B/gAntqFIlgQUTVBIzD9kehI9R7VrC6663kbmG5JIkPfVllITmbwfu72U/3WUlJ9CQASJ84TF6OqqeHI78Bn6nVndY7p2Mfda5N2DQLC9AywF51kAK6AcC7C7Pc3MWD52Tyg9FrsFQ==\r\n"+
