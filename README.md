@@ -29,4 +29,6 @@ A Yucata account is a prerequisite to use this apps functionality.
 - 0.5.0
   * display list of games (tap on count)
   * landscape layout
+- 0.5.1
+  * login bug fix by [keinkurt](https://github.com/keinkurt)
   
