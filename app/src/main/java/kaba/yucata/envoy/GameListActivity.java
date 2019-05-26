@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import kaba.yucata.envoy.datalink.GamelistDbHelper;
@@ -84,7 +85,7 @@ public class GameListActivity extends AppCompatActivity {
             }
             void bind(StateInfo.Game game) {
                 tvGameName.setText(game.name);
-                tvSinceLM.setText(sinceString(game.lastMoveOn.getTime()));
+                tvSinceLM.setText(sinceString(game.lastMoveOn));
                 tvOpponents.setText(StateInfo.Player.toString(game.players));
                 if (game.isNextOnTurn) {
                     nextOnMove.setVisibility(View.VISIBLE);
@@ -102,7 +103,10 @@ public class GameListActivity extends AppCompatActivity {
                 tvOpponents.setText( t.toString() );
             }
             // todo: i18n
-            private String sinceString(long then_millis) {
+            private String sinceString( Date d ) {
+                if( d == null )
+                    return "";
+                final long then_millis = d.getTime();
                 final long diff_millis = System.currentTimeMillis() - then_millis;
                 if(true&&DEBUG)
                     System.out.println(" now "+System.currentTimeMillis()+" - "+then_millis+" = "+diff_millis);

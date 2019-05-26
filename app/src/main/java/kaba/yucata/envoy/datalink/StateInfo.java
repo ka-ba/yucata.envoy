@@ -170,7 +170,7 @@ public class StateInfo {
         public boolean isOnTurn=false;
         public final boolean isNextOnTurn;
         public final boolean isRanking;
-        public final Date lastMoveOn;
+        public final Date lastMoveOn; // may be null if not parsable
         public final int playerOnTurn;
         public final Collection<Player> players;
         Game(JSONObject json, int game_on_turn)
@@ -185,16 +185,16 @@ public class StateInfo {
             // IsTournament
             // in java 8 't would be this:
             // lastMoveOn = OffsetDateTime.parse( json.getString("LastMoveOn") );
+            Date d=null;
             try {
-                Date d=null;
                 if( DTFORMAT != null )
                     d = DTFORMAT.parse( json.getString("LastMoveOn") );
-                lastMoveOn = d;
                 if(true&&DEBUG)
                     System.out.println(" got date "+(d==null?"null":d.toString())+" by "+(DTFORMAT==null?"null":DTFORMAT.toString()) );
             } catch (ParseException e) {
-                throw new JSONException("cannot parse date in LastMoveOn: "+e.getMessage());
+                System.out.println(" cannot parse date in LastMoveOn: "+e.getMessage());
             }
+            lastMoveOn = d;
             // MayDelete
             // NumPlayers
             playerOnTurn = json.getInt("PlayerOnTurn");
