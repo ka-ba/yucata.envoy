@@ -9,6 +9,9 @@ import android.support.annotation.RequiresApi;
 
 import java.util.List;
 
+import kaba.yucata.envoy.BuildConfig;
+import kaba.yucata.envoy.util.DebugHelper;
+
 import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
 import static android.app.job.JobScheduler.RESULT_SUCCESS;
 
@@ -18,6 +21,7 @@ import static android.app.job.JobScheduler.RESULT_SUCCESS;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class LolliDataService extends DataService {
+    public final boolean DEBUG= BuildConfig.DEBUG;
     private final JobScheduler scheduler;
     private static final long flexMillis=60*1000;
 
@@ -29,7 +33,8 @@ public class LolliDataService extends DataService {
 
     @Override
     public boolean resetTimer() {
-        System.out.println("will change scheduling interval to "+interval+" min");
+//        System.out.println("will change scheduling interval to "+interval+" min");
+        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("will change scheduling interval to "+interval+" min",3) );
         scheduler.cancel(JOB_ID);
         return schedule();
     }

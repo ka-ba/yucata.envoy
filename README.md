@@ -31,6 +31,9 @@ A Yucata account is a prerequisite to use this apps functionality.
   * landscape layout
 - 0.5.1
   * login bug fix by [keinkurt](https://github.com/keinkurt)
-- 0.5.1
-  * works on Android 9 Pie (LineageOS 16.0) now
+- 0.5.2
+  * targets for Android 8
   * doesn't throw exception anymore when unable to parse a date
+- 0.5.3
+  * works on Android 9 Pie (LineageOS 16.0) now
+  * notifications pop up again on Android 8+

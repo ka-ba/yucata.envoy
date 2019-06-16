@@ -275,7 +275,7 @@ public class GameCountActivity extends AppCompatActivity
         stopButtonCountdown(true);
     }
     private void stopButtonCountdown( boolean stop_timer ) {
-        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("stopping countdown",4));
+        if(false&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("stopping countdown",4));
         if(stop_timer)
             stopCountdownTimer();
         if( ! buttonErrorHidden ) {
@@ -285,7 +285,7 @@ public class GameCountActivity extends AppCompatActivity
     }
 
     private void stopCountdownTimer() {
-        if(true&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("stopping countdown timer",4));
+        if(false&&DEBUG) System.out.println(DebugHelper.textAndTraceHead("stopping countdown timer",4));
         if(reloadCountdown!=null) {
             reloadCountdown.cancel();
             reloadCountdown = null;
