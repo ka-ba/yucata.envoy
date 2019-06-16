@@ -36,12 +36,14 @@ public class StateInfo {
     private ServerAbstraction.SessionAbstraction session=null;
     //    private static SimpleDateFormat DTFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
     /** may be null on older versions */
-    private static SimpleDateFormat DTFORMAT = null;
+    private static SimpleDateFormat DTFORMAT = null, DTFORMAT2 = null;
     { // older Java versions don't know X
         try {
             DTFORMAT = new SimpleDateFormat("y-M-d'T'H:m:s.SSSSSSSX");
+            DTFORMAT2 = new SimpleDateFormat("y-M-d' 'H:m:s.S' 'X"); // "2019-06-16 11:25:00.000 +02"
         } catch(Throwable t) {
             DTFORMAT=null;
+            DTFORMAT2=null;
             System.out.println(t.toString());
             t.printStackTrace();
         }
@@ -190,9 +192,16 @@ public class StateInfo {
                 if( DTFORMAT != null )
                     d = DTFORMAT.parse( json.getString("LastMoveOn") );
                 if(true&&DEBUG)
-                    System.out.println(" got date "+(d==null?"null":d.toString())+" by "+(DTFORMAT==null?"null":DTFORMAT.toString()) );
+                    System.out.println(" got date "+(d==null?"null":d.toString())+" by DTFORMAT "+(DTFORMAT==null?"null":DTFORMAT.toString()) );
             } catch (ParseException e) {
-                System.out.println(" cannot parse date in LastMoveOn: "+e.getMessage());
+                try {
+                    if( DTFORMAT2 != null )
+                        d = DTFORMAT2.parse( json.getString("LastMoveOn") );
+                    if(true&&DEBUG)
+                        System.out.println(" got date "+(d==null?"null":d.toString())+" by DTFORMAT2 "+(DTFORMAT2==null?"null":DTFORMAT2.toString()) );
+                } catch (ParseException ee) {
+                    System.out.println(" cannot parse date in LastMoveOn: "+e.getMessage()+" and "+ee.getMessage());
+                }
             }
             lastMoveOn = d;
             // MayDelete
